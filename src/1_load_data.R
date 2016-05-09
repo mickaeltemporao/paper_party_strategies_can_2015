@@ -10,29 +10,35 @@ election <- 'PTY_CAN_Quebec_09_04_2012'
 
 # TV debates
 Deb <- readstata13::read.dta13(
-  paste0(data_path, 'TV debates/', election, '_Debates_recoded.dta')
+  paste0(data_path, 'TV debates/', election, '_Debates_recoded.dta'),
+  fromEncoding= "macintosh", encoding= "UTF-8"
   )
 
 # TV-ads
 Ads <- readstata13::read.dta13(
-  paste0(data_path, 'TV-ads/', election, '_TVads.xls_recoded.dta')
+  paste0(data_path, 'TV-ads/', election, '_TVads.xls_recoded.dta'),
+  fromEncoding= "macintosh", encoding= "UTF-8"
   )
 
 # Manifestos
 Man <- readstata13::read.dta13(
-  paste0(data_path, 'Manifestos/', election, '_Platforms.dta')
+  paste0(data_path, 'Manifestos/', election, '_Platforms.dta'),
+  fromEncoding= "macintosh", encoding= "UTF-8"
   )
 
 # Expert Surveys
 ExS <- readstata13::read.dta13(
-  paste0(data_path, 'TV debates/', election, '_Debates_recoded.dta')
+  paste0(data_path, 'TV debates/', election, '_Debates_recoded.dta'),
+  fromEncoding= "macintosh", encoding= "UTF-8"
   )
 
 # TODO: Social Media Data (Fb&Tw)
 Fb  <- readstata13::read.dta13(
-  paste0(data_path, 'Social Media/', election, '_Debates_recoded.dta')
+  paste0(data_path, 'Social Media/', election, '_Debates_recoded.dta'),
+  fromEncoding= "macintosh", encoding= "UTF-8"
   )
 
 Tw  <- readstata13::read.dta13(
-  paste0(data_path, 'Social Media/', election, '_Debates_recoded.dta')
+  paste0(data_path, 'Social Media/', election, '_Debates_recoded.dta'),
+  fromEncoding= "macintosh", encoding= "UTF-8"
   )
