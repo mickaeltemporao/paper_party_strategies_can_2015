@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:14:49
-# Modified:     2016-05-09 11:33:28
+# Modified:     2016-05-11 10:20:40
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -14,7 +14,8 @@
 list_packages <- c(
   "devtools",
   "dplyr",
-  "ggplot2"
+  "ggplot2",
+  "readstata13"
 )
 
 to_install <- list_packages[!(list_packages %in% installed.packages()[,"Package"])]

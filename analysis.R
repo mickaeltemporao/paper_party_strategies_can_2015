@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-05-09 14:50:02
+# Modified:     2016-05-11 16:13:37
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -16,22 +16,30 @@ src = list.files('src/', pattern="*.R")
 sapply(paste0('src/',src),source,.GlobalEnv)
 
 # Analysis of Debate Data ------------------------------------------------------
-str(Deb)
 
-### 62400: PLQ
-### 62700: PQ
-### 62401: CAQ
-### 62300: QS
+## Party Codes
+# 62300: QS
+# 62400: PLQ
+# 62401: CAQ
+# 62700: PQ
 
 ## 1. Positive negative debate by party
 test <- subset(Deb, direction!=99 &
   actorparty %in% c(62400, 62700, 62401, 62300))
 
-table(test$direction, test$actorparty)
+counts <- table(test$direction, test$actorparty)
+round(prop.table(counts, 2), 2)
 
-ggplot(test, aes(x=factor(actorparty), fill=factor(direction))) +
-  geom_bar(position='dodge') +
-  scale_fill_grey()
+pdf('/figs/pos_neg.pdf')
+barplot(counts, main='Positive-Negative Sentences in TV Debates',
+  names.arg=c("QS", "PLQ", "CAQ", "PQ"),
+  beside=T, ylim=c(0,200)
+)
+legend("topleft", c("Positive","Negative"), fill=c(0,1), bty="n")
+
+## Target of Attacks in TV Debates
+table(Target=test$objectparty, Actors=test$actorparty)
+round(prop.table(table(Target=test$objectparty, Actors=test$actorparty), 2),2)
 
 # 2. Most common topics
 ## - Most negative topics
