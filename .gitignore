@@ -2,7 +2,8 @@
 .Rhistory
 .Rapp.history
 
-# Loading Data Files
+# Data Files
+/data/
 /src/1_load_data.R
 
 # Session Data files
