@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-05-11 16:13:37
+# Modified:     2016-05-12 12:36:03
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -23,25 +23,29 @@ sapply(paste0('src/',src),source,.GlobalEnv)
 # 62401: CAQ
 # 62700: PQ
 
-## 1. Positive negative debate by party
+## Positive negative debate by party
 test <- subset(Deb, direction!=99 &
   actorparty %in% c(62400, 62700, 62401, 62300))
 
 counts <- table(test$direction, test$actorparty)
 round(prop.table(counts, 2), 2)
 
-pdf('/figs/pos_neg.pdf')
+pdf('figs/pos_neg.pdf')
 barplot(counts, main='Positive-Negative Sentences in TV Debates',
   names.arg=c("QS", "PLQ", "CAQ", "PQ"),
   beside=T, ylim=c(0,200)
 )
 legend("topleft", c("Positive","Negative"), fill=c(0,1), bty="n")
+dev.off()
 
 ## Target of Attacks in TV Debates
 table(Target=test$objectparty, Actors=test$actorparty)
 round(prop.table(table(Target=test$objectparty, Actors=test$actorparty), 2),2)
 
-# 2. Most common topics
+# Most common topics
+
+table(test$actorparty, test$traittype)
+
 ## - Most negative topics
 ## - Most positive topics
 # 3. Evolution of topics during campaign
