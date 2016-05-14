@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-05-14 10:59:32
+# Modified:     2016-05-14 11:39:18
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -15,47 +15,14 @@
 src = list.files('src/', pattern="*.R")
 sapply(paste0('src/',src),source,.GlobalEnv)
 
-# Analysis of TV Ads Data ------------------------------------------------------
+# Analysis of TV Data Data ------------------------------------------------------
 
-## Party Codes
-# 62100: PV
-# 62300: NPD
-# 62400: PLC
-# 62700: BQ
-# 62600: PCC
 ## Positive negative debate by party
-Ads <- subset(Ads, direction!=99 &
-  actorparty %in% c(62100, 62300, 62400, 62700, 62600))
 
-## Recode party numbers to chars
-Ads[Ads==62100] <- 'PV'
-Ads[Ads==62300] <- 'NPD'
-Ads[Ads==62400] <- 'PLC'
-Ads[Ads==62700] <- 'BQ'
-Ads[Ads==62600] <- 'PCC'
-
-## Recode dates
-substrRight <- function(x, n){
-  substr(x, nchar(x)-n+1, nchar(x))
-}
-
-Ads$year <- as.numeric(substrRight(Ads$date, 4))
-Ads$month <- substrRight(Ads$date, 6)
-Ads$month <- as.numeric(substr(Ads$month, 1,2))
-Ads$day <- as.numeric(substr(Ads$date, 1,nchar(Ads$date)-6))
-
-# Dummy Date
-Ads$post <- 0
-Ads$post[Ads$day>=18 & Ads$month>=9] <- 1
-Ads <- subset(Ads, objectparty!=99)
-
-pre <- subset(Ads, post==0)
-post <- subset(Ads, post == 1)
-
-counts <- table(Ads$direction, Ads$actorparty)
+counts <- table(Data$direction, Data$actorparty)
 counts <- round(prop.table(counts, 2), 2)
 
-g <- ggplot(Ads, aes(x=reorder(actorparty, direction), fill=factor(direction) ))
+g <- ggplot(Data, aes(x=reorder(actorparty, direction), fill=factor(direction) ))
 g + geom_bar( position='fill') +
   theme(axis.text=element_text(size=60),
         axis.title=element_text(size=60,face="bold")) +
@@ -77,35 +44,35 @@ dev.off()
 # 1 pour object (combien de x on parle du party + pos neg a lint)
 
 # TABLEAU XXXX
-Ads <- subset(Ads, direction==0)
-Ads <- subset(Ads, objectparty!=99)
+Data <- subset(Data, direction==0)
+Data <- subset(Data, objectparty!=99)
 pre <- subset(pre, direction==0)
 pre <- subset(pre, objectparty!=99)
 post <- subset(post, direction==0)
 post <- subset(post, objectparty!=99)
 
-# Ads <- subset(Ads, objectparty!='BQ')
+# Data <- subset(Data, objectparty!='BQ')
 # pre <- subset(pre, objectparty!='BQ')
 # post <- subset(post, objectparty!='BQ')
 
 # Negative sentences targetting other parties
-Ads$test <- 0
-Ads$test[Ads$objectparty==Ads$actorparty] <- 1
-table1 <- subset(Ads,test !=1)
+Data$test <- 0
+Data$test[Data$objectparty==Data$actorparty] <- 1
+table1 <- subset(Data,test !=1)
 table(Target=table1$objectparty, Actors=table1$actorparty)
 round(prop.table(table(Actors=table1$actorparty, Target=table1$objectparty ), 1),2)
 
 # TODO:Proportions par + prop direction + value
 # http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualization
-round(prop.table(table(Ads$objectparty)), 2)
-barplot(round(prop.table(table(Ads$objectparty)), 2))
+round(prop.table(table(Data$objectparty)), 2)
+barplot(round(prop.table(table(Data$objectparty)), 2))
 
-round(prop.table(table(Actors=Ads$actorparty, Target=Ads$objectparty), 1), 2)
+round(prop.table(table(Actors=Data$actorparty, Target=Data$objectparty), 1), 2)
 round(prop.table(table(Actors=pre$actorparty, Target=pre$objectparty), 1), 2)
 round(prop.table(table(Actors=post$actorparty, Target=post$objectparty), 1), 2)
 
-#TODO: Order by negativePositive-Negative Sentences in all TV Ads
-c_all <- round(prop.table(table(Ads$direction, Ads$actorparty), 2), 2)
+#TODO: Order by negativePositive-Negative Sentences in all TV Data
+c_all <- round(prop.table(table(Data$direction, Data$actorparty), 2), 2)
 c_pre <- round(prop.table(table(pre$direction, pre$actorparty), 2), 2)
 c_post <- round(prop.table(table(post$direction, post$actorparty), 2), 2)
 c_post[2,] <- sort(c_post[2,])
@@ -117,7 +84,7 @@ barplot(c_pre, main='Pre', horiz=TRUE)
 barplot(c_post, main='Post', horiz=TRUE)
 
 # Most common topics
-table(Ads$actorparty, Ads$traittype)
+table(Data$actorparty, Data$traittype)
 
 # Expert survey-----------------
 
