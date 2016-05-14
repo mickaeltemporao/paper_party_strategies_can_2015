@@ -1,12 +1,17 @@
 # Analysis of party strategies
-Summary page of party strategies analysis of CAN2015.
+Summary page of party strategies analysis for CAN2015.
 
-## Data - CAN2015 (by priority):
-1. Debates
+## Data available:
+1. TV Debates
+    * TVA
+    * RC
 2. Ads
-3. Party Manifestos
-4. Expert surveys
-5. Social media (FB & TW)
+    * TV Ads
+    * Newspaper Ads
+3. Expert surveys
+4. Social Media
+    * Facebook
+    * Twitter
 
 ## Analysis:
 1. Most common topics

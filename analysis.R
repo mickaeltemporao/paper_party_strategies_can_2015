@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-05-13 14:45:26
+# Modified:     2016-05-14 10:59:32
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -15,12 +15,6 @@
 src = list.files('src/', pattern="*.R")
 sapply(paste0('src/',src),source,.GlobalEnv)
 
-# Rename Variable Names
-t <- names(Ads)
-t <- tolower(gsub(" ", "", t, fixed = TRUE))
-names(Ads) <- t
-names(Exp)
-
 # Analysis of TV Ads Data ------------------------------------------------------
 
 ## Party Codes
@@ -29,7 +23,6 @@ names(Exp)
 # 62400: PLC
 # 62700: BQ
 # 62600: PCC
-
 ## Positive negative debate by party
 Ads <- subset(Ads, direction!=99 &
   actorparty %in% c(62100, 62300, 62400, 62700, 62600))
@@ -54,6 +47,7 @@ Ads$day <- as.numeric(substr(Ads$date, 1,nchar(Ads$date)-6))
 # Dummy Date
 Ads$post <- 0
 Ads$post[Ads$day>=18 & Ads$month>=9] <- 1
+Ads <- subset(Ads, objectparty!=99)
 
 pre <- subset(Ads, post==0)
 post <- subset(Ads, post == 1)
@@ -61,29 +55,28 @@ post <- subset(Ads, post == 1)
 counts <- table(Ads$direction, Ads$actorparty)
 counts <- round(prop.table(counts, 2), 2)
 
-g <- ggplot(Ads, aes(x=actorparty, fill=factor(direction) ))
+g <- ggplot(Ads, aes(x=reorder(actorparty, direction), fill=factor(direction) ))
 g + geom_bar( position='fill') +
   theme(axis.text=element_text(size=60),
         axis.title=element_text(size=60,face="bold")) +
-  scale_fill_brewer(palette="Paired")+
-  theme_minimal()
+  scale_fill_brewer(palette="Paired") +
+  coord_flip()+
+  theme_bw()
 
 #TODO: by avant/après
-
 pdf('figs/pos_neg.pdf')
-barplot(counts, main='Positive-Negative Sentences in TV Debates',
+barplot(reorder(counts, party), main='Positive-Negative Sentences in TV Debates', horiz=TRUE
   #ylim=c(0,200)
 )
 #legend("bottom", c("Positive","Negative"), fill=c(0,1), bty="n")
 dev.off()
 
-## Target of Attacks in TV Debates
-#
-table(Target=Ads$objectparty, Actors=Ads$actorparty)
-round(prop.table(table(Target=Ads$objectparty, Actors=Ads$actorparty), 2),2)
+
+## 2 bar plot
+# 1 pour actor (combien de fois le party parle + pos neg a lintérieur)
+# 1 pour object (combien de x on parle du party + pos neg a lint)
 
 # TABLEAU XXXX
-
 Ads <- subset(Ads, direction==0)
 Ads <- subset(Ads, objectparty!=99)
 pre <- subset(pre, direction==0)
@@ -91,21 +84,37 @@ pre <- subset(pre, objectparty!=99)
 post <- subset(post, direction==0)
 post <- subset(post, objectparty!=99)
 
-Ads <- subset(Ads, objectparty!='BQ')
-pre <- subset(pre, objectparty!='BQ')
-post <- subset(post, objectparty!='BQ')
+# Ads <- subset(Ads, objectparty!='BQ')
+# pre <- subset(pre, objectparty!='BQ')
+# post <- subset(post, objectparty!='BQ')
+
+# Negative sentences targetting other parties
+Ads$test <- 0
+Ads$test[Ads$objectparty==Ads$actorparty] <- 1
+table1 <- subset(Ads,test !=1)
+table(Target=table1$objectparty, Actors=table1$actorparty)
+round(prop.table(table(Actors=table1$actorparty, Target=table1$objectparty ), 1),2)
+
+# TODO:Proportions par + prop direction + value
+# http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualization
+round(prop.table(table(Ads$objectparty)), 2)
+barplot(round(prop.table(table(Ads$objectparty)), 2))
 
 round(prop.table(table(Actors=Ads$actorparty, Target=Ads$objectparty), 1), 2)
 round(prop.table(table(Actors=pre$actorparty, Target=pre$objectparty), 1), 2)
 round(prop.table(table(Actors=post$actorparty, Target=post$objectparty), 1), 2)
 
+#TODO: Order by negativePositive-Negative Sentences in all TV Ads
 c_all <- round(prop.table(table(Ads$direction, Ads$actorparty), 2), 2)
 c_pre <- round(prop.table(table(pre$direction, pre$actorparty), 2), 2)
 c_post <- round(prop.table(table(post$direction, post$actorparty), 2), 2)
+c_post[2,] <- sort(c_post[2,])
 par(mfrow = c(3, 1))
-barplot(c_all, main='Positive-Negative Sentences in all TV Debates')
-barplot(c_pre, main='Positive-Negative Sentences in TV Debates previous DATE')
-barplot(c_post, main='Positive-Negative Sentences in TV Debates post DATE')
+layout(matrix(c(0,0,0,1,1,1,1,1,0,0,0,2,2,2,2,2,0,3,3,3,3,3), 11, 2))
+
+barplot(c_all, main='All Campaign', horiz=TRUE)
+barplot(c_pre, main='Pre', horiz=TRUE)
+barplot(c_post, main='Post', horiz=TRUE)
 
 # Most common topics
 table(Ads$actorparty, Ads$traittype)

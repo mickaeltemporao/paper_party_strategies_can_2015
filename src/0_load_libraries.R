@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:14:49
-# Modified:     2016-05-13 10:40:18
+# Modified:     2016-05-13 18:14:52
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -15,6 +15,8 @@ list_packages <- c(
   "devtools",
   "dplyr",
   "ggplot2",
+  "grid",
+  "gridExtra",
   "readstata13",
   "readxl"
 )
