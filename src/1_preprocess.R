@@ -5,13 +5,32 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-05-14 12:01:54
+# Modified:     2016-05-15 17:34:11
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
 
+# Loading Data Sets ------------------------------------------------------------
+# TV debates
+Deb_RC <- read_excel('data/2015_medw/Debates/RC/DEBATE_CAN_24_09_2015_TelevisedDebateData.xlsx')
+Deb_TVA <- read_excel('data/2015_medw/Debates/TVA/DEBATE_CAN_02_10_2015_TelevisedDebateData.xlsx')
+
+# TV-ads
+Ads_TV <- read_excel('data/2015_medw/TVAds/TVADS_CAN_19_10_2015_TelevisionCommercialsData.xls')
+
+# Expert Surveys
+Experts <- readstata13::read.dta13(
+  'data/2015_medw/ExpertSurvey/Exp_data_2015r.dta',
+  fromEncoding= "macintosh", encoding= "UTF-8"
+)
+
+# TODO: Social Media Data (Fb&Tw)
+# Fb  <-
+# Tw  <-
+
+## Preprocessing the Data -----------------------------------------------------
 # Creating a list the data to be used filtered by UpperCase first letter
 df_list <- lapply(ls(pattern="^[A-Z]"), get)
 names(df_list) <- ls(pattern="^[A-Z]")
