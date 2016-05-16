@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-05-15 17:34:11
+# Modified:     2016-05-15 20:42:03
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -51,16 +51,14 @@ Data <- data.table::rbindlist(df_list, fill=T)
 Data$type_source <- rep(names(df_list), sapply(df_list, nrow))
 names(Data) <- gsub(".", "", names(Data), fixed = TRUE)
 
-# Clean workspace
-rm(list=setdiff(ls(), "Data"))
-gc()
-
 # Filter only sentences made by parties
-Data <- subset(
-  Data, actorparty %in%
-  c(62100, 62300, 62400, 62700, 62600)
-)
-Data <- subset(Data, objectparty!=99)
+# Data <- subset(
+#   Data, actorparty %in%
+#   c(62100, 62300, 62400, 62700, 62600)
+# )
+
+# Data <- subset(Data, actorparty!=99)
+# Data <- subset(Data, objectparty!=99)
 
 # Recode Party Codes
 Data[Data==62100] <- 'PV'
@@ -82,3 +80,10 @@ Data$day <- as.numeric(substr(Data$date, 1,nchar(Data$date)-6))
 # Dummy Date
 Data$post <- 0
 Data$post[Data$day>=18 & Data$month>=9] <- 1
+
+# Reordering variables
+Data <- Data %>% select(noquote(order(colnames(Data))))
+
+# Clean workspace
+rm(list=setdiff(ls(), "Data"))
+gc()
