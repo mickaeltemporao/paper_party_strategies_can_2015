@@ -5,24 +5,32 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-05-15 21:30:01
+# Modified:     2016-05-16 11:26:09
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
 
+# Functions --------------------------------------------------------------------
+# Subset strings from right
+right_substring <- function(x, n){
+  substr(x, nchar(x)-n+1, nchar(x))
+}
+
 # Loading Data Sets ------------------------------------------------------------
 # TV debates
-Deb_RC <- read_excel('data/2015_medw/Debates/RC/DEBATE_CAN_24_09_2015_TelevisedDebateData.xlsx')
-Deb_TVA <- read_excel('data/2015_medw/Debates/TVA/DEBATE_CAN_02_10_2015_TelevisedDebateData.xlsx')
+Deb_RC <- read_excel('data/2015_medw_charles/Debates/RC/DEBATE_CAN_24_09_2015_TelevisedDebateData.xlsx')
+Deb_TVA <- read_excel('data/2015_medw_charles/Debates/TVA/DEBATE_CAN_02_10_2015_TelevisedDebateData.xlsx')
+Deb_McL <- read_excel('data/2015_medw_scott/Debates/McL/DEBATE_CAN_06_08_2015_TelevisedDebateData.xlsx')
+Deb_McL[,12] <- '20:00 pm'
 
 # TV-ads
-Ads_TV <- read_excel('data/2015_medw/TVAds/TVADS_CAN_19_10_2015_TelevisionCommercialsData.xls')
+Ads_TV <- read_excel('data/2015_medw_charles/TVAds/TVADS_CAN_19_10_2015_TelevisionCommercialsData.xls')
 
 # Expert Surveys
 Experts <- readstata13::read.dta13(
-  'data/2015_medw/ExpertSurvey/Exp_data_2015r.dta',
+  'data/2015_medw_charles/ExpertSurvey/Exp_data_2015r.dta',
   fromEncoding= "macintosh", encoding= "UTF-8"
 )
 
@@ -67,11 +75,8 @@ Data[Data==62400] <- 'LPC'
 Data[Data==62700] <- 'BQ'
 Data[Data==62600] <- 'CPC'
 
-## Recode dates
-right_substring <- function(x, n){
-  substr(x, nchar(x)-n+1, nchar(x))
-}
-
+# Recode dates in TV Ads
+# Create 'post' event variables based on specific date
 Data$year <- as.numeric(right_substring(Data$date, 4))
 Data$month <- right_substring(Data$date, 6)
 Data$month <- as.numeric(substr(Data$month, 1,2))
