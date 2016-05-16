@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-05-15 20:42:03
+# Modified:     2016-05-15 21:30:01
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -61,11 +61,11 @@ names(Data) <- gsub(".", "", names(Data), fixed = TRUE)
 # Data <- subset(Data, objectparty!=99)
 
 # Recode Party Codes
-Data[Data==62100] <- 'PV'
-Data[Data==62300] <- 'NPD'
-Data[Data==62400] <- 'PLC'
+Data[Data==62100] <- 'GPC'
+Data[Data==62300] <- 'NDP'
+Data[Data==62400] <- 'LPC'
 Data[Data==62700] <- 'BQ'
-Data[Data==62600] <- 'PCC'
+Data[Data==62600] <- 'CPC'
 
 ## Recode dates
 right_substring <- function(x, n){
@@ -83,6 +83,10 @@ Data$post[Data$day>=18 & Data$month>=9] <- 1
 
 # Reordering variables
 Data <- Data %>% select(noquote(order(colnames(Data))))
+
+# Recode Direction
+Data$direction[Data$direction == 0] <- 'Negative'
+Data$direction[Data$direction == 1] <- 'Positive'
 
 # Clean workspace
 rm(list=setdiff(ls(), "Data"))
