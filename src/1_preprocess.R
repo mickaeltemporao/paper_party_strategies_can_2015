@@ -5,12 +5,13 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-05-16 11:26:09
+# Modified:     2016-05-16 12:45:53
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
+rm(list=ls())
 
 # Functions --------------------------------------------------------------------
 # Subset strings from right
@@ -74,6 +75,16 @@ Data[Data==62300] <- 'NDP'
 Data[Data==62400] <- 'LPC'
 Data[Data==62700] <- 'BQ'
 Data[Data==62600] <- 'CPC'
+
+Data[Data=="ndp"] <- "NDP"
+Data[Data=="bloc"] <- "BQ"
+Data[Data=="lpc"] <- "LPC"
+Data[Data=="cpc"] <- "CPC"
+Data[Data=="green"] <- "GPC"
+
+Data[Data=="NPD"] <- "NDP"
+Data[Data=="PLC"] <- "LPC"
+Data[Data=="PCC"] <- "CPC"
 
 # Recode dates in TV Ads
 # Create 'post' event variables based on specific date
