@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-05-14 11:39:18
+# Modified:     2016-05-15 23:45:06
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -15,35 +15,43 @@
 src = list.files('src/', pattern="*.R")
 sapply(paste0('src/',src),source,.GlobalEnv)
 
-# Analysis of TV Data Data ------------------------------------------------------
+# 1. Analysis of Advertisements -----------------------------------------------
+## TV Ads
 
-## Positive negative debate by party
+### Actor Party
+type    <- c( "Ads_TV", "Deb_RC", "Deb_TVA", "Experts")
+figure  <- 'pos_neg'
+object  <- c('actorparty', 'objectparty')
 
-counts <- table(Data$direction, Data$actorparty)
-counts <- round(prop.table(counts, 2), 2)
+#### General Plot
+for (i in object) {
+  for (j in type) {
+    plot_data <- filter(Data, type_source==j, direction!=99) %>%
+      rename_(key=i) %>% filter(key %in% c("BQ", "CPC", "GPC", "LPC", "NDP")) %>%
+      group_by(key, direction) %>% summarise (n = n()) %>%
+      arrange(key, direction) %>%
+      mutate(df_sum = round(cumsum(n)-0.5*n,0)) %>% ungroup %>% group_by(key) %>%
+      mutate(freq = paste0(round(n / sum(n)*100, 0),' %')) %>%
+      mutate(pos_plot = ifelse(direction == 'Negative', n, 0))
+    plot_data
+    p <- ggplot(plot_data,
+      aes(x=reorder(key, -pos_plot), y=n, fill=direction)) +
+      geom_bar(stat="identity")+
+      geom_text(aes(y=df_sum, label=freq), vjust=1,
+        color="white", size=3.5)+
+      scale_fill_grey(name='')+
+      xlab('')+ ylab('')+
+      theme_wsj()+
+      theme(legend.position='top',
+        legend.background= element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"),
+        plot.background = element_rect(fill = "white"))
+    ggsave(paste0('figs/', j, '_', figure, '_', i, '.pdf'), width = 7, height = 7)
+  }
+}
 
-g <- ggplot(Data, aes(x=reorder(actorparty, direction), fill=factor(direction) ))
-g + geom_bar( position='fill') +
-  theme(axis.text=element_text(size=60),
-        axis.title=element_text(size=60,face="bold")) +
-  scale_fill_brewer(palette="Paired") +
-  coord_flip()+
-  theme_bw()
+# Tables
 
-#TODO: by avant/après
-pdf('figs/pos_neg.pdf')
-barplot(reorder(counts, party), main='Positive-Negative Sentences in TV Debates', horiz=TRUE
-  #ylim=c(0,200)
-)
-#legend("bottom", c("Positive","Negative"), fill=c(0,1), bty="n")
-dev.off()
-
-
-## 2 bar plot
-# 1 pour actor (combien de fois le party parle + pos neg a lintérieur)
-# 1 pour object (combien de x on parle du party + pos neg a lint)
-
-# TABLEAU XXXX
 Data <- subset(Data, direction==0)
 Data <- subset(Data, objectparty!=99)
 pre <- subset(pre, direction==0)
@@ -63,7 +71,6 @@ table(Target=table1$objectparty, Actors=table1$actorparty)
 round(prop.table(table(Actors=table1$actorparty, Target=table1$objectparty ), 1),2)
 
 # TODO:Proportions par + prop direction + value
-# http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualization
 round(prop.table(table(Data$objectparty)), 2)
 barplot(round(prop.table(table(Data$objectparty)), 2))
 
@@ -82,9 +89,6 @@ layout(matrix(c(0,0,0,1,1,1,1,1,0,0,0,2,2,2,2,2,0,3,3,3,3,3), 11, 2))
 barplot(c_all, main='All Campaign', horiz=TRUE)
 barplot(c_pre, main='Pre', horiz=TRUE)
 barplot(c_post, main='Post', horiz=TRUE)
-
-# Most common topics
-table(Data$actorparty, Data$traittype)
 
 # Expert survey-----------------
 
