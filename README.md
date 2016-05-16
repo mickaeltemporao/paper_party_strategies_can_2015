@@ -19,6 +19,8 @@ Descriptive analysis of party strategies during the 2015 Canadian Federal Campai
 
 #### TV Ads
 
+![Ads_TV_pos_neg_actorparty](figs/Ads_TV_pos_neg_actorparty.pdf)
+
 ## 2 bar plot
 # 1 pour actor (combien de fois le party parle + pos neg a lintérieur)
 # 1 pour object (combien de x on parle du party + pos neg a lint)
