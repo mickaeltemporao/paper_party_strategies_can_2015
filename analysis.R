@@ -5,13 +5,12 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-05-16 13:18:39
+# Modified:     2016-05-16 15:08:21
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
-
 src = list.files('src/', pattern="*.R")
 sapply(paste0('src/',src),source,.GlobalEnv)
 
@@ -118,3 +117,7 @@ for (i in unique(Data$post)) {
   print(output)
   write.csv(output, paste0('figs/tables/', j,'_xtarget_yactors', ifelse(i==1, 'post', 'pre'), '.csv'))
 }
+
+# Ads by party
+test <- Data %>% filter(type_source == 'Ads_TV'), group_by(
+# Quasisentences by Ads by party
