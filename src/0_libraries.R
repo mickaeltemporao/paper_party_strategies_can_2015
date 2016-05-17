@@ -1,11 +1,11 @@
 #!/usr/bin/env Rscript
 # ------------------------------------------------------------------------------
-# Title:        TODO: (add title)
-# Filename:     0_load_libraries.R
-# Description:  TODO: (write me)
+# Title:        Libraries.R
+# Filename:     0_libraries.R
+# Description:  Installs and loads requirred libraries
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:14:49
-# Modified:     2016-05-15 21:43:58
+# Modified:     2016-05-17 06:51:57
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -16,8 +16,6 @@ list_packages <- c(
   "dplyr",
   "ggplot2",
   "ggthemes",
-  "grid",
-  "gridExtra",
   "readstata13",
   "readxl"
 )

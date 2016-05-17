@@ -1,11 +1,11 @@
 #!/usr/bin/env Rscript
 # ------------------------------------------------------------------------------
-# Title:        TODO: (add title)
+# Title:        Data preprocessing script
 # Filename:     test.R
-# Description:  TODO: (write me)
+# Description:  Opens data sets and preprocesses them for the analysis
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-05-16 12:45:53
+# Modified:     2016-05-17 06:52:59
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
