@@ -1,6 +1,11 @@
 #  Party Strategies of the 2015 Canadian Federal Campaign
 Descriptive analysis of party strategies during the 2015 Canadian Federal Campaign.
 
+## Files
+- analysis.R: Code to generate plots and tables
+- figs/: Contains figures and tables
+- src/: Contains pre requisites packages and data manipulations
+
 ## Data available:
 1. Ads
     * TV Ads
