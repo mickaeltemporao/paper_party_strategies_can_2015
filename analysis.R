@@ -5,7 +5,7 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-05-17 21:18:22
+# Modified:     2016-05-18 11:04:13
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -118,12 +118,26 @@ for (i in unique(Data$post)) {
   write.csv(output, paste0('figs/tables/', j,'_xtarget_yactors', ifelse(i==1, 'post', 'pre'), '.csv'))
 }
 
-# Summary of sentences by ads by party
+# Data summaries sentences by ads by party
 Data <- tbl_df(Data)
-for (j in type) {
-  output <- Data %>% dplyr::filter(type_source == j) %>% ungroup %>%dplyr::select(actorparty, adid) %>%
-    dplyr::group_by(actorparty, adid) %>%
-    dplyr::summarise(count = n()) %>% dplyr::summarise_each(funs(n(), sum, mean, sd))
+
+# TV Ads summaries
+output <- Data %>% filter(type_source=='Ads_TV') %>%
+  select(actorparty, adid) %>%
+  group_by(actorparty, adid) %>%
+  summarise(count = n()) %>%
+  summarise_each(funs(n(), sum, mean, sd)) %>%
+  select(-contains('adid'))
+names(output) <- c('actorparty', 'ads_count', 'sent_count', 'avg_sent', 'sd_sent')
+print(output)
+write.csv(output, paste0('figs/tables/summaries_', 'Ads_TV', '.csv'))
+
+# Debates summaries
+debs <- type[2:4]
+for (j in debs) {
+  output <- Data %>% filter(type_source == j) %>% select(actorparty, direction) %>%
+    group_by(actorparty, direction) %>%
+    summarise(count = n())
   print(output)
   write.csv(output, paste0('figs/tables/summaries_', j, '.csv'))
 }
