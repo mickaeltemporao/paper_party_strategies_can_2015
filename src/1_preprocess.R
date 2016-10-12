@@ -5,7 +5,7 @@
 # Description:  Opens data sets and preprocesses them for the analysis
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-05-17 06:52:59
+# Modified:     2016-10-12 09:24:16
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -20,32 +20,37 @@ right_substring <- function(x, n){
 }
 
 # Loading Data Sets ------------------------------------------------------------
+
+temp  <- list.files(path='data', pattern="*.xlsx", full.names=T)
+files <- lapply(temp, read_excel)
+
 # TV debates
-Deb_RC <- read_excel('data/2015_medw_charles/Debates/RC/DEBATE_CAN_24_09_2015_TelevisedDebateData.xlsx')
-Deb_TVA <- read_excel('data/2015_medw_charles/Debates/TVA/DEBATE_CAN_02_10_2015_TelevisedDebateData.xlsx')
-Deb_McL <- read_excel('data/2015_medw_scott/Debates/McL/DEBATE_CAN_06_08_2015_TelevisedDebateData.xlsx')
-Deb_McL[,12] <- '20:00 pm'
+# Deb_RC <- read_excel('data/DEBATE_CAN_24_09_2015_TelevisedDebateData.xlsx')
+# Deb_TVA <- read_excel('data/DEBATE_CAN_02_10_2015_TelevisedDebateData.xlsx')
+# Deb_MCL <- read_excel('data/DEBATE_CAN_06_08_2015_TelevisedDebateData.xlsx')
+# Deb_MCL[,12] <- '20:00 pm'
 
 # TV-ads
-Ads_TV <- read_excel('data/2015_medw_charles/TVAds/TVADS_CAN_19_10_2015_TelevisionCommercialsData.xls')
+# Ads_TV <- read_excel('data/TVAds/TVADS_CAN_19_10_2015_TelevisionCommercialsData.xls')
 
 # Expert Surveys
-Experts <- readstata13::read.dta13(
-  'data/2015_medw_charles/ExpertSurvey/Exp_data_2015r.dta',
-  fromEncoding= "macintosh", encoding= "UTF-8"
-)
+# Experts <- readstata13::read.dta13(
+#   'data/2015_medw_charles/ExpertSurvey/Exp_data_2015r.dta',
+#   fromEncoding= "macintosh", encoding= "UTF-8"
+# )
 
 # TODO: Social Media Data (Fb&Tw)
 # Fb  <-
 # Tw  <-
 
 ## Preprocessing the Data -----------------------------------------------------
-# Creating a list the data to be used filtered by UpperCase first letter
-df_list <- lapply(ls(pattern="^[A-Z]"), get)
-names(df_list) <- ls(pattern="^[A-Z]")
+
+# Creating a list of the data to be used filtered by UpperCase first letter
+# files <- lapply(ls(pattern="^[A-Z]"), get)
+# names(files) <- ls(pattern="^[A-Z]")
 
 # Convert all variable names to lower case for merge
-df_list <- lapply(df_list,
+files <- lapply(files,
   function(i) {
     y <- data.frame(i)
     names(y) <- gsub(" ", "", names(y), fixed = TRUE)
@@ -54,10 +59,11 @@ df_list <- lapply(df_list,
   }
 )
 
-# Convert df_list to a global data.frame with all data types
-Data <- data.table::rbindlist(df_list, fill=T)
+# Convert files to a global data.frame with all data types
+Data <- data.table::rbindlist(files, fill=T)
+dim(Data)
 # Create type of data variable in Global data.frame
-Data$type_source <- rep(names(df_list), sapply(df_list, nrow))
+Data$type_source <- rep(names(files), sapply(files, nrow))
 names(Data) <- gsub(".", "", names(Data), fixed = TRUE)
 
 # Filter only sentences made by parties
