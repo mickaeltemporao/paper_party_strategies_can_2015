@@ -5,7 +5,7 @@
 # Description:  Opens data sets and preprocesses them for the analysis
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-10-12 09:24:16
+# Modified:     2016-10-12 19:08:29
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -22,13 +22,18 @@ right_substring <- function(x, n){
 # Loading Data Sets ------------------------------------------------------------
 
 temp  <- list.files(path='data', pattern="*.xlsx", full.names=T)
-files <- lapply(temp, read_excel)
+#files <- lapply(temp, read_excel)
 
 # TV debates
-# Deb_RC <- read_excel('data/DEBATE_CAN_24_09_2015_TelevisedDebateData.xlsx')
-# Deb_TVA <- read_excel('data/DEBATE_CAN_02_10_2015_TelevisedDebateData.xlsx')
-# Deb_MCL <- read_excel('data/DEBATE_CAN_06_08_2015_TelevisedDebateData.xlsx')
-# Deb_MCL[,12] <- '20:00 pm'
+Deb_RC  <- read_excel('data/DEBATE_CAN_24_09_2015_TelevisedDebateData.xlsx')
+Deb_TVA <- read_excel('data/DEBATE_CAN_02_10_2015_TelevisedDebateData.xlsx')
+Deb_MCL <- read_excel('data/DEBATE_CAN_06_08_2015_TelevisedDebateData.xlsx')
+Deb_GM  <- read_excel('data/DEBATE_CAN_17_09_2015_TelevisedDebateData.xlsx')
+Deb_MD  <- read_excel('data/DEBATE_CAN_28_09_2015_TelevisedDebateData.xlsx')
+
+Deb_MCL[,12] <- '20:00 pm'
+Deb_GM[,12]  <- '20:00 pm'
+Deb_MD[,12]  <- '19:00 pm'
 
 # TV-ads
 # Ads_TV <- read_excel('data/TVAds/TVADS_CAN_19_10_2015_TelevisionCommercialsData.xls')
@@ -46,8 +51,8 @@ files <- lapply(temp, read_excel)
 ## Preprocessing the Data -----------------------------------------------------
 
 # Creating a list of the data to be used filtered by UpperCase first letter
-# files <- lapply(ls(pattern="^[A-Z]"), get)
-# names(files) <- ls(pattern="^[A-Z]")
+files <- lapply(ls(pattern="^[A-Z]"), get)
+names(files) <- ls(pattern="^[A-Z]")
 
 # Convert all variable names to lower case for merge
 files <- lapply(files,
@@ -61,7 +66,6 @@ files <- lapply(files,
 
 # Convert files to a global data.frame with all data types
 Data <- data.table::rbindlist(files, fill=T)
-dim(Data)
 # Create type of data variable in Global data.frame
 Data$type_source <- rep(names(files), sapply(files, nrow))
 names(Data) <- gsub(".", "", names(Data), fixed = TRUE)
