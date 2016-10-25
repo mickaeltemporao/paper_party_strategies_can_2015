@@ -5,7 +5,7 @@
 # Description:  Opens data sets and preprocesses them for the analysis
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-10-12 19:08:29
+# Modified:     2016-10-25 06:59:43
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -20,23 +20,8 @@ right_substring <- function(x, n){
 }
 
 # Loading Data Sets ------------------------------------------------------------
-
 temp  <- list.files(path='data', pattern="*.xlsx", full.names=T)
-#files <- lapply(temp, read_excel)
-
-# TV debates
-Deb_RC  <- read_excel('data/DEBATE_CAN_24_09_2015_TelevisedDebateData.xlsx')
-Deb_TVA <- read_excel('data/DEBATE_CAN_02_10_2015_TelevisedDebateData.xlsx')
-Deb_MCL <- read_excel('data/DEBATE_CAN_06_08_2015_TelevisedDebateData.xlsx')
-Deb_GM  <- read_excel('data/DEBATE_CAN_17_09_2015_TelevisedDebateData.xlsx')
-Deb_MD  <- read_excel('data/DEBATE_CAN_28_09_2015_TelevisedDebateData.xlsx')
-
-Deb_MCL[,12] <- '20:00 pm'
-Deb_GM[,12]  <- '20:00 pm'
-Deb_MD[,12]  <- '19:00 pm'
-
-# TV-ads
-# Ads_TV <- read_excel('data/TVAds/TVADS_CAN_19_10_2015_TelevisionCommercialsData.xls')
+files <- lapply(temp, read_excel)
 
 # Expert Surveys
 # Experts <- readstata13::read.dta13(
@@ -44,15 +29,14 @@ Deb_MD[,12]  <- '19:00 pm'
 #   fromEncoding= "macintosh", encoding= "UTF-8"
 # )
 
-# TODO: Social Media Data (Fb&Tw)
+# TODO: Social Media Data (FB&TW)
 # Fb  <-
 # Tw  <-
 
 ## Preprocessing the Data -----------------------------------------------------
 
 # Creating a list of the data to be used filtered by UpperCase first letter
-files <- lapply(ls(pattern="^[A-Z]"), get)
-names(files) <- ls(pattern="^[A-Z]")
+names(files) <- str_extract(temp, "[A-Z]+_[A-Z]+")
 
 # Convert all variable names to lower case for merge
 files <- lapply(files,
@@ -67,7 +51,8 @@ files <- lapply(files,
 # Convert files to a global data.frame with all data types
 Data <- data.table::rbindlist(files, fill=T)
 # Create type of data variable in Global data.frame
-Data$type_source <- rep(names(files), sapply(files, nrow))
+data_type <- str_extract(names(files), "[A-Z]+")
+Data$type_source <- rep(data_type, sapply(files, nrow))
 names(Data) <- gsub(".", "", names(Data), fixed = TRUE)
 
 # Filter only sentences made by parties
@@ -96,23 +81,17 @@ Data[Data=="NPD"] <- "NDP"
 Data[Data=="PLC"] <- "LPC"
 Data[Data=="PCC"] <- "CPC"
 
-# Recode dates in TV Ads
-# Create 'post' event variables based on specific date
-Data$year <- as.numeric(right_substring(Data$date, 4))
-Data$month <- right_substring(Data$date, 6)
-Data$month <- as.numeric(substr(Data$month, 1,2))
-Data$day <- as.numeric(substr(Data$date, 1,nchar(Data$date)-6))
-
 # Dummy Date
 Data$post <- 0
 Data$post[Data$day>=18 & Data$month>=9] <- 1
 
 # Reordering variables
-Data <- Data %>% select(noquote(order(colnames(Data))))
+Data <- Data %>% select(order(colnames(Data)))
 
 # Recode Direction
 Data$direction[Data$direction == 0] <- 'Negative'
 Data$direction[Data$direction == 1] <- 'Positive'
+Data <- data.frame(Data)
 
 # Clean workspace
 rm(list=setdiff(ls(), "Data"))
