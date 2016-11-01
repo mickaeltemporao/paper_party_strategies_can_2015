@@ -5,7 +5,7 @@
 # Description:  Opens data sets and preprocesses them for the analysis
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-10-25 06:59:43
+# Modified:     2016-10-31 15:26:11
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -71,10 +71,10 @@ Data[Data==62400] <- 'LPC'
 Data[Data==62700] <- 'BQ'
 Data[Data==62600] <- 'CPC'
 
-Data[Data=="ndp"] <- "NDP"
-Data[Data=="bloc"] <- "BQ"
-Data[Data=="lpc"] <- "LPC"
-Data[Data=="cpc"] <- "CPC"
+Data[Data=="ndp"]   <- "NDP"
+Data[Data=="bloc"]  <- "BQ"
+Data[Data=="lpc"]   <- "LPC"
+Data[Data=="cpc"]   <- "CPC"
 Data[Data=="green"] <- "GPC"
 
 Data[Data=="NPD"] <- "NDP"

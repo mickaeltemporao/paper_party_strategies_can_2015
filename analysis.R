@@ -5,7 +5,7 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-05-18 11:04:13
+# Modified:     2016-10-31 14:59:07
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -73,7 +73,7 @@ for (i in object) {
           legend.background= element_rect(fill = "white"),
           panel.background = element_rect(fill = "white"),
           plot.background = element_rect(fill = "white"))
-      ggsave(paste0('figs/prop_', j, '_', figure, '_', i, '.pdf'), width = 7, height = 7)
+      ggsave(paste0('figs/prop_', format(Sys.time(), "%Y%m%d"),'_', j, '_', figure, '_', i, '.pdf'), width = 7, height = 7)
   }
 }
 
