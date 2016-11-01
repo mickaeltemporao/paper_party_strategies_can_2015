@@ -5,12 +5,13 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-10-31 14:59:07
+# Modified:     2016-11-01 10:48:23
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
+rm(list=ls())
 src = list.files('src/', pattern="*.R")
 sapply(paste0('src/',src),source,.GlobalEnv)
 
@@ -25,10 +26,13 @@ figure  <- 'pos_neg'
 for (i in object) {
   for (j in type) {
       plot_data <- filter(Data, type_source==j, direction!=99) %>%
-        rename_(key=i) %>% filter(key %in% c("BQ", "CPC", "GPC", "LPC", "NDP")) %>%
-        group_by(key, direction) %>% summarise (n = n()) %>%
+        rename_(key=i) %>%
+        filter(key %in% c("BQ", "CPC", "GPC", "LPC", "NDP")) %>%
+        group_by(key, direction) %>%
+        summarise (n = n()) %>%
         arrange(key, direction) %>%
-        mutate(df_sum = round(cumsum(n)-0.5*n,0)) %>% ungroup %>% group_by(key) %>%
+        mutate(df_sum = round(cumsum(n)-0.5*n,0)) %>%
+        ungroup %>% group_by(key) %>%
         mutate(freq = paste0(round(n / sum(n)*100, 0),' %')) %>%
         mutate(pos_plot = ifelse(direction == 'Negative', n, 0))
       plot_data

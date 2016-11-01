@@ -5,22 +5,15 @@
 # Description:  Opens data sets and preprocesses them for the analysis
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-10-31 15:26:11
+# Modified:     2016-11-01 11:42:38
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
-rm(list=ls())
-
-# Functions --------------------------------------------------------------------
-# Subset strings from right
-right_substring <- function(x, n){
-  substr(x, nchar(x)-n+1, nchar(x))
-}
-
 # Loading Data Sets ------------------------------------------------------------
-temp  <- list.files(path='data', pattern="*.xlsx", full.names=T)
+temp  <- list.files(path='data', pattern="TVADS", full.names=T)
+#temp  <- list.files(path='data', pattern="*.xlsx", full.names=T)
 files <- lapply(temp, read_excel)
 
 # Expert Surveys
@@ -49,7 +42,8 @@ files <- lapply(files,
 )
 
 # Convert files to a global data.frame with all data types
-Data <- data.table::rbindlist(files, fill=T)
+
+Data <- plyr::rbind.fill(files)
 # Create type of data variable in Global data.frame
 data_type <- str_extract(names(files), "[A-Z]+")
 Data$type_source <- rep(data_type, sapply(files, nrow))
@@ -63,6 +57,8 @@ names(Data) <- gsub(".", "", names(Data), fixed = TRUE)
 
 # Data <- subset(Data, actorparty!=99)
 # Data <- subset(Data, objectparty!=99)
+
+Data <- Data %>% select(actorparty, objectparty, direction, language, adid, spotlength, tone)
 
 # Recode Party Codes
 Data[Data==62100] <- 'GPC'
@@ -82,16 +78,12 @@ Data[Data=="PLC"] <- "LPC"
 Data[Data=="PCC"] <- "CPC"
 
 # Dummy Date
-Data$post <- 0
-Data$post[Data$day>=18 & Data$month>=9] <- 1
-
-# Reordering variables
-Data <- Data %>% select(order(colnames(Data)))
+# Data$post <- 0
+# Data$post[Data$day>=18 & Data$month>=9] <- 1
 
 # Recode Direction
-Data$direction[Data$direction == 0] <- 'Negative'
-Data$direction[Data$direction == 1] <- 'Positive'
-Data <- data.frame(Data)
+Data <- Data %>% rename(positive = direction)
+Data[Data==99] <- NA
 
 # Clean workspace
 rm(list=setdiff(ls(), "Data"))
