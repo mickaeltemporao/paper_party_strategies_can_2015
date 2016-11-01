@@ -5,19 +5,16 @@
 # Description:  Installs and loads requirred libraries
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:14:49
-# Modified:     2016-11-01 12:23:41
+# Modified:     2016-11-01 12:26:10
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
 list_packages <- c(
-  "devtools",
   "dplyr",
   "ggplot2",
-  "ggthemes",
-  "readstata13",
-  "readxl"
+  "ggthemes"
 )
 
 to_install <- list_packages[!(list_packages %in% installed.packages()[,"Package"])]
