@@ -5,7 +5,7 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-11-01 14:48:47
+# Modified:     2016-11-01 15:25:00
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -16,11 +16,16 @@ src = list.files('src/features', pattern="*.R")
 sapply(paste0('src/features/',src),source,.GlobalEnv)
 
 # 1. Analysis of all data sets available ---------------------------------------
+# voir s'il y a une tendance dans le temps
+# est-ce que cette tendance est distincte entre les francais et anglais
 
 ### Actor Party
 object  <- c('actorparty', 'objectparty') # i <- object[1]
 type    <- unique(Data$type_source) # j <- type[1]
 figure  <- 'pos_neg'
+
+Data <- Data[!is.na(Data$direction),]
+Data <- filter(Data, actorparty %in% c('CPC', 'NDP', 'LPC'))
 
 # Direction of quasi sentences
 ggplot(Data, aes(actorparty)) +
