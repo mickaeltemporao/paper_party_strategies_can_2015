@@ -5,7 +5,7 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-11-01 15:25:00
+# Modified:     2016-11-01 15:37:31
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -13,7 +13,7 @@
 # ------------------------------------------------------------------------------
 rm(list=ls())
 src = list.files('src/features', pattern="*.R")
-sapply(paste0('src/features/',src),source,.GlobalEnv)
+sapply(paste0('src/features/',src), source, .GlobalEnv)
 
 # 1. Analysis of all data sets available ---------------------------------------
 # voir s'il y a une tendance dans le temps
