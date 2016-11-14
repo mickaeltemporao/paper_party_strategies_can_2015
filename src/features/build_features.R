@@ -5,7 +5,7 @@
 # Description:  Opens data sets and preprocesses them for the analysis
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-11-01 14:31:34
+# Modified:     2016-11-14 11:16:33
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -20,10 +20,12 @@ d2 <- data.frame(readxl::read_excel(temp[2]))
 
 d1$unique_id <- paste0(d1[,which(names(d1)=='Coder.ID')],'_', d1[,which(names(d1)=='Ad.ID')])
 d2$unique_id <- paste0(d2[,which(names(d1)=='Coder.ID')],'_', d2[,which(names(d1)=='Ad.ID')])
-#d1$Date
-#d2$Data <-
 
-files <- list(d1, d2)
+# Handling Dates
+d2$Date <- as.numeric(gsub("[^0-9]", "", d2$Date))
+d2$Date <- as.Date(as.character(d2$Date), "%Y%m%d")
+d1$Date <- ifelse(nchar(d1$Date) == 7, paste0('0', d1$Date), d1$Date)
+d1$Date <- as.Date(as.character(d1$Date), "%d%m%Y")
 
 # Expert Surveys
 # Experts <- readstata13::read.dta13(
