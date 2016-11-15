@@ -5,27 +5,49 @@
 # Description:  Opens data sets and preprocesses them for the analysis
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-11-14 11:16:33
+# Modified:     2016-11-15 07:40:09
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
-# Loading Data Sets ------------------------------------------------------------
+
+#### FUNS --------------------------------
+getData <- function (x) {
+  require(dplyr)
+  d <- data.frame(readxl::read_excel(x))
+  names(d) <- gsub(".", "", names(d), fixed = TRUE)
+  names(d) <- tolower(names(d))
+  d <- d %>%
+    select(date,
+           actorparty,
+           objectparty,
+           direction,
+           language,
+           tone,
+           spotlength,
+           adid
+    ) %>% return
+}
+
+#### Loading Data Sets --------------------------------
 temp  <- list.files(path='data', pattern="TVADS", full.names=T)
 #temp  <- list.files(path='data', pattern="*.xlsx", full.names=T)
 #files <- lapply(temp, readxl::read_excel)
-d1 <- data.frame(readxl::read_excel(temp[1]))
-d2 <- data.frame(readxl::read_excel(temp[2]))
 
-d1$unique_id <- paste0(d1[,which(names(d1)=='Coder.ID')],'_', d1[,which(names(d1)=='Ad.ID')])
-d2$unique_id <- paste0(d2[,which(names(d1)=='Coder.ID')],'_', d2[,which(names(d1)=='Ad.ID')])
+d1 <- getData(temp[1])
+d2 <- getData(temp[2])
+
+# Creating a unique ID
+d1$unique_id <- paste0('TVAds1_', d1[,which(names(d1)=='adid')])
+d2$unique_id <- paste0('TVAds2_', d2[,which(names(d1)=='adid')])
 
 # Handling Dates
-d2$Date <- as.numeric(gsub("[^0-9]", "", d2$Date))
-d2$Date <- as.Date(as.character(d2$Date), "%Y%m%d")
-d1$Date <- ifelse(nchar(d1$Date) == 7, paste0('0', d1$Date), d1$Date)
-d1$Date <- as.Date(as.character(d1$Date), "%d%m%Y")
+d2$date <- gsub("2016", "2015", d2$date)
+d2$date <- as.numeric(gsub("[^0-9]", "", d2$date))
+d2$date <- as.Date(as.character(d2$date), "%Y%m%d")
+d1$date <- ifelse(nchar(d1$date) == 7, paste0('0', d1$date), d1$date)
+d1$date <- as.Date(as.character(d1$date), "%d%m%Y")
 
 # Expert Surveys
 # Experts <- readstata13::read.dta13(
@@ -40,7 +62,7 @@ d1$Date <- as.Date(as.character(d1$Date), "%d%m%Y")
 ## Preprocessing the Data -----------------------------------------------------
 
 # Creating a list of the data to be used filtered by UpperCase first letter
-names(files) <- stringr::str_extract(temp, "[A-Z]+_[A-Z]+")
+#names(files) <- stringr::str_extract(temp, "[A-Z]+_[A-Z]+")
 
 # # Convert all variable names to lower case for merge
 # files <- lapply(files,
@@ -53,15 +75,17 @@ names(files) <- stringr::str_extract(temp, "[A-Z]+_[A-Z]+")
 # )
 
 # Convert files to a global data.frame with all data types
-Data <- plyr::rbind.fill(files)
+#Data <- plyr::rbind.fill(files)
 
 # Create type of data variable in Global data.frame
-data_type <- stringr::str_extract(names(files), "[A-Z]+")
-Data$type_source <- rep(data_type, sapply(files, nrow))
-names(Data) <- gsub(".", "", names(Data), fixed = TRUE)
-names(Data) <- tolower(names(Data))
+#data_type <- stringr::str_extract(names(files), "[A-Z]+")
+#Data$type_source <- rep(data_type, sapply(files, nrow))
+d1$type_source <- 'TV_Ads'
+d2$type_source <- 'TV_Ads'
 
-Data <- Data %>% select(type_source, unique_id, actorparty, objectparty, direction, language, tone, spotlength)
+Data <- plyr::rbind.fill(d1,d2)
+Data <- as.data.frame(Data)
+
 
 # Recode Party Codes
 Data[Data==62100] <- 'GPC'
@@ -70,27 +94,21 @@ Data[Data==62400] <- 'LPC'
 Data[Data==62700] <- 'BQ'
 Data[Data==62600] <- 'CPC'
 
-Data[Data=="ndp"]   <- "NDP"
-Data[Data=="bloc"]  <- "BQ"
-Data[Data=="lpc"]   <- "LPC"
-Data[Data=="cpc"]   <- "CPC"
-Data[Data=="green"] <- "GPC"
-
-Data[Data=="NPD"] <- "NDP"
-Data[Data=="PLC"] <- "LPC"
-Data[Data=="PCC"] <- "CPC"
-
-# Dummy Date
+# Dummy date
 # Data$post <- 0
 # Data$post[Data$day>=18 & Data$month>=9] <- 1
 
 # Recode Variables
-Data$direction[Data$direction==1] <- 'positive'
-Data$direction[Data$direction==0] <- 'negative'
+# Data$direction[Data$direction==1] <- 'positive'
+# Data$direction[Data$direction==0] <- 'negative'
+
+Data$direction[Data$direction==1] <- 1
+Data$direction[Data$direction==0] <- -1
+
 Data[Data==99] <- NA
 Data$language[Data$language==1] <- 'en'
 Data$language[Data$language==3] <- 'fr'
 
 # Clean workspace
 rm(list=setdiff(ls(), "Data"))
-gc()
+invisible(gc())

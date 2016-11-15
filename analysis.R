@@ -5,7 +5,7 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-11-01 15:37:31
+# Modified:     2016-11-15 11:30:15
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -19,13 +19,138 @@ sapply(paste0('src/features/',src), source, .GlobalEnv)
 # voir s'il y a une tendance dans le temps
 # est-ce que cette tendance est distincte entre les francais et anglais
 
-### Actor Party
-object  <- c('actorparty', 'objectparty') # i <- object[1]
-type    <- unique(Data$type_source) # j <- type[1]
-figure  <- 'pos_neg'
-
 Data <- Data[!is.na(Data$direction),]
-Data <- filter(Data, actorparty %in% c('CPC', 'NDP', 'LPC'))
+Data <- subset(Data, actorparty %in% c('CPC', 'NDP', 'LPC'))
+
+# Avg Direction per day
+d <- Data %>% select(-adid, -objectparty) %>%
+  group_by(unique_id, date, actorparty) %>%
+  arrange(date) %>% summarize(direction=mean(direction))
+ggplot(d, aes(x=date, y=direction)) +
+  geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
+  geom_smooth(aes(color=actorparty), se=F, size=2) +
+  theme_fivethirtyeight() +
+  ggtitle('Average Direction per Ad per Party') +
+  scale_colour_manual(name  ="",
+                      values=c("#135895", "#d71920", "#f37021"),
+                      breaks=c("CPC", "NDP", "LPC"),
+                      labels=c("CPC", "NDP", "LPC")
+                      ) +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_avg_by_party.png'), width = 10, height = 7)
+
+# Negative Count per ad per day
+d <- Data %>% select(-adid, -objectparty) %>%
+  group_by(unique_id, date, actorparty) %>% dplyr::filter(direction==-1) %>%
+  summarize(target = n())
+ggplot(d, aes(x=date, y=target)) +
+  geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
+  geom_smooth(aes(color=actorparty), se=F, size=2) +
+  theme_fivethirtyeight() +
+  ggtitle('Negative Sentences Count per Ad by Party') +
+  scale_colour_manual(name  ="",
+                      values=c("#135895", "#d71920", "#f37021"),
+                      breaks=c("CPC", "NDP", "LPC"),
+                      labels=c("CPC", "NDP", "LPC")
+                      ) +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_count_by_party.png'), width = 10, height = 7)
+
+# Negative proportion per ad per day
+d <- Data %>% select(-adid, -objectparty) %>%
+  group_by(unique_id, date, actorparty, direction) %>%
+  summarize(n = n()) %>%
+  mutate(target = round(n / sum(n),2)) %>%
+  ungroup %>%
+  dplyr::filter(direction == -1) %>% print
+ggplot(d, aes(x=date, y=target)) +
+  geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
+  geom_smooth(aes(color=actorparty), se=F, size=2) +
+  theme_fivethirtyeight() +
+  ggtitle('Proportion of Negative Sentences per Ad by Party') +
+  scale_colour_manual(name  ="",
+                      values=c("#135895", "#d71920", "#f37021"),
+                      breaks=c("CPC", "NDP", "LPC"),
+                      labels=c("CPC", "NDP", "LPC")
+                      ) +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_prop_by_party.png'), width = 10, height = 7)
+
+
+# Avg Direction per day per by language
+d <- Data %>% select(-adid, -objectparty) %>%
+  group_by(unique_id, date, actorparty, language) %>%
+  arrange(date) %>% summarize(direction=mean(direction))
+ggplot(d, aes(x=date, y=direction)) +
+  geom_jitter(aes(color=actorparty), size = 4, alpha=0.2) +
+  geom_smooth(aes(color=actorparty, linetype=language), size=2, se=F) +
+  theme_fivethirtyeight() +
+  ggtitle('Average Direction per Ad per Party by languange') +
+  scale_colour_manual(name  ="",
+                      values=c("#135895", "#d71920", "#f37021"),
+                      breaks=c("CPC", "NDP", "LPC"),
+                      labels=c("CPC", "NDP", "LPC")
+                      ) +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_avg_by_party_by_lang.png'), width = 10, height = 7)
+
+# Negative Count per ad per day by language
+d <- Data %>% select(-adid, -objectparty) %>%
+  group_by(unique_id, date, actorparty, language) %>% dplyr::filter(direction==-1) %>%
+  summarize(target = n())
+ggplot(d, aes(x=date, y=target)) +
+  geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
+  geom_smooth(aes(color=actorparty, linetype=language), se=F, size=2) +
+  theme_fivethirtyeight() +
+  ggtitle('Negative Sentences Count per Ad by Party by Language') +
+  scale_colour_manual(name  ="",
+                      values=c("#135895", "#d71920", "#f37021"),
+                      breaks=c("CPC", "NDP", "LPC"),
+                      labels=c("CPC", "NDP", "LPC")
+                      ) +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_count_by_party_by_lang.png'), width = 10, height = 7)
+
+# Negative proportion per ad per day
+info <- Data %>% select(unique_id, language) %>% unique
+d <- Data %>% select(-adid, -objectparty) %>%
+  group_by(unique_id, date, actorparty, direction) %>%
+  summarize(n = n()) %>%
+  mutate(target = round(n / sum(n),2)) %>%
+  ungroup %>%
+  dplyr::filter(direction == -1) %>%
+  left_join(info) %>% print
+ggplot(d, aes(x=date, y=target)) +
+  geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
+  geom_smooth(aes(color=actorparty, linetype=language), se=F, size=2) +
+  theme_fivethirtyeight() +
+  ggtitle('Proportion of Negative Sentences per Ad by Party by Language') +
+  scale_colour_manual(name  ="",
+                      values=c("#135895", "#d71920", "#f37021"),
+                      breaks=c("CPC", "NDP", "LPC"),
+                      labels=c("CPC", "NDP", "LPC")
+                      ) +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_prop_by_party_by_lang.png'), width = 10, height = 7)
+
 
 # Direction of quasi sentences
 ggplot(Data, aes(actorparty)) +
@@ -62,6 +187,12 @@ ggsave(paste0('reports/figures/tvads_sent_prop_dir_fr.png'), width = 7, height =
 ggplot(filter(Data, language=='en'), aes(actorparty)) +
   geom_bar(aes(fill=direction), position='fill')
 ggsave(paste0('reports/figures/tvads_sent_prop_dir_en.png'), width = 7, height = 7)
+
+
+### Actor Party
+object  <- c('actorparty', 'objectparty') # i <- object[1]
+type    <- unique(Data$type_source) # j <- type[1]
+figure  <- 'pos_neg'
 
 #### General plots for actorparty, objectparty with counts
 for (i in object) {
