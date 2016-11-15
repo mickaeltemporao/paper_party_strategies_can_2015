@@ -1,9 +1,11 @@
 # Party Strategies of the 2015 Canadian Federal Campaign
 Descriptive analysis of party strategies during the 2015 Canadian Federal Campaign.
 
-## Files
-
+##TODO:
 - [] Add Folder Structure Description
+
+##Summary
+![Average direction of TV Ads by Party by Language]('reports/figures/20161115_tvads_neg_avg_by_party_by_lang.png')
 
 ## Data available:
 1. Ads
