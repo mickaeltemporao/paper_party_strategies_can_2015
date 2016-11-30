@@ -5,7 +5,7 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-11-15 11:30:15
+# Modified:     2016-11-30 14:25:50
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -14,7 +14,7 @@
 rm(list=ls())
 src = list.files('src/features', pattern="*.R")
 sapply(paste0('src/features/',src), source, .GlobalEnv)
-
+span <- 3
 # 1. Analysis of all data sets available ---------------------------------------
 # voir s'il y a une tendance dans le temps
 # est-ce que cette tendance est distincte entre les francais et anglais
@@ -28,7 +28,7 @@ d <- Data %>% select(-adid, -objectparty) %>%
   arrange(date) %>% summarize(direction=mean(direction))
 ggplot(d, aes(x=date, y=direction)) +
   geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
-  geom_smooth(aes(color=actorparty), se=F, size=2) +
+  geom_smooth(aes(color=actorparty), span = span, se=F, size=2) +
   theme_fivethirtyeight() +
   ggtitle('Average Direction per Ad per Party') +
   scale_colour_manual(name  ="",
@@ -48,7 +48,7 @@ d <- Data %>% select(-adid, -objectparty) %>%
   summarize(target = n())
 ggplot(d, aes(x=date, y=target)) +
   geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
-  geom_smooth(aes(color=actorparty), se=F, size=2) +
+  geom_smooth(aes(color=actorparty), span = span, se=F, size=2) +
   theme_fivethirtyeight() +
   ggtitle('Negative Sentences Count per Ad by Party') +
   scale_colour_manual(name  ="",
@@ -71,7 +71,7 @@ d <- Data %>% select(-adid, -objectparty) %>%
   dplyr::filter(direction == -1) %>% print
 ggplot(d, aes(x=date, y=target)) +
   geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
-  geom_smooth(aes(color=actorparty), se=F, size=2) +
+  geom_smooth(aes(color=actorparty), se=F, span = span, size=2) +
   theme_fivethirtyeight() +
   ggtitle('Proportion of Negative Sentences per Ad by Party') +
   scale_colour_manual(name  ="",
@@ -92,7 +92,7 @@ d <- Data %>% select(-adid, -objectparty) %>%
   arrange(date) %>% summarize(direction=mean(direction))
 ggplot(d, aes(x=date, y=direction)) +
   geom_jitter(aes(color=actorparty), size = 4, alpha=0.2) +
-  geom_smooth(aes(color=actorparty, linetype=language), size=2, se=F) +
+  geom_smooth(aes(color=actorparty, linetype=language), span = span, size=2, se=F) +
   theme_fivethirtyeight() +
   ggtitle('Average Direction per Ad per Party by languange') +
   scale_colour_manual(name  ="",
@@ -112,7 +112,7 @@ d <- Data %>% select(-adid, -objectparty) %>%
   summarize(target = n())
 ggplot(d, aes(x=date, y=target)) +
   geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
-  geom_smooth(aes(color=actorparty, linetype=language), se=F, size=2) +
+  geom_smooth(aes(color=actorparty, linetype=language), span = span, se=F, size=2) +
   theme_fivethirtyeight() +
   ggtitle('Negative Sentences Count per Ad by Party by Language') +
   scale_colour_manual(name  ="",
@@ -137,7 +137,7 @@ d <- Data %>% select(-adid, -objectparty) %>%
   left_join(info) %>% print
 ggplot(d, aes(x=date, y=target)) +
   geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
-  geom_smooth(aes(color=actorparty, linetype=language), se=F, size=2) +
+  geom_smooth(aes(color=actorparty, linetype=language), span = span, se=F, size=2) +
   theme_fivethirtyeight() +
   ggtitle('Proportion of Negative Sentences per Ad by Party by Language') +
   scale_colour_manual(name  ="",
