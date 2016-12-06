@@ -5,7 +5,7 @@
 # Description:  Twitter Topic Modeling Using R
 # Version:      0.0.0.000
 # Created:      2016-10-17 20:15:03
-# Modified:     2016-12-06 11:56:22
+# Modified:     2016-12-06 12:00:26
 # Author:       Mickael Temporão, based on Bryan Goodrich TwitterTopics.R
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -31,7 +31,7 @@ tweets <- gsub("pbs\\.twimg.+","",tweets)        # Remove source in tweest
 tweets <- iconv(tweets, to = "ASCII", sub = " ") # Convert to basic ASCII text to avoid silly characters
 tweets <- tolower(tweets)                        # Make everything consistently lower case
 tweets <- gsub("^(\\w+)", "", tweets)            # Remove first word of sentence (account name here)
-tweets <- gsub("rt", " ", tweets)                # Remove the "RT" (retweet) so duplicates are duplicates
+tweets <- gsub("^rt", " ", tweets)                # Remove the "RT" (retweet) so duplicates are duplicates
 tweets <- gsub("@\\w+", " ", tweets)             # Remove user names (all proper names if you're wise!)
 tweets <- gsub("http.+ |http.+$", " ", tweets)   # Remove links
 tweets <- gsub("[[:punct:]]", " ", tweets)       # Remove punctuation
@@ -44,9 +44,10 @@ tweets <- gsub(" +", " ", tweets)                # General spaces (should just d
 ## Replace original message by clean tweets
 d$message <- tweets
 
-## TODO: MAKE DATE FIELD
-test <- openxlsx::convertToDate(d$date)
-d$date <- as.Date(as.character(d1$date), "%d%m%Y")
+## MAKE DATE FIELD
+d$date  <- openxlsx::convertToDate(d$date)
+d$day   <- NULL
+d$month <- NULL
 
 ## Get language
 d$lang <- textcat(tweets)
@@ -81,6 +82,7 @@ temp_words <- c("elxn42", "cdnpoli", "retweet", "elxn", "aug", "sep", "oct",
                 "get", "neet", "can", "say", "tpp", "last", "may", "qpgpc", "see",
                 "time", "teamtrudeau", "tmpm", "take", "tonight", "now", "watch",
                 "live", "day", "vancouver", "faceafacetva", "need", "let", "look",
+                "ready4chang",
                 account_names)
 
 corpus <- tm_map(corpus, removeWords, temp_words, mc.cores=1)
