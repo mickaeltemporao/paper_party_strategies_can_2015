@@ -5,7 +5,7 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-11-30 14:25:50
+# Modified:     2016-12-06 15:25:17
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
