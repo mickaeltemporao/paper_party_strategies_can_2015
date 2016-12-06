@@ -5,7 +5,7 @@
 # Description:  Twitter Topic Modeling Using R
 # Version:      0.0.0.000
 # Created:      2016-10-17 20:15:03
-# Modified:     2016-12-01 16:41:04
+# Modified:     2016-12-06 11:42:15
 # Author:       Mickael Temporão, based on Bryan Goodrich TwitterTopics.R
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -20,10 +20,11 @@ library(topicmodels)
 library(SnowballC)
 library(textcat)
 
+source('settings.R')
 d <- openxlsx::read.xlsx('data/twitter_feeds_can2016.xlsx')
 
 #### Preprocess Tweets --------------------------------
-acounts_names <- gsub("([A-Za-z]+).*", "\\1", d$message) # Extract first word of sentence (account name)
+account_names <- gsub("([A-Za-z]+).*", "\\1", d$message) # Extract first word of sentence (account name)
 
 tweets <- d$message
 tweets <- gsub("pbs\\.twimg.+","",tweets)        # Remove source in tweest
@@ -39,14 +40,18 @@ tweets <- gsub("amp", " ", tweets)               # "&" is "&amp" in HTML, so aft
 tweets <- gsub("^ ", "", tweets)                 # Leading blanks
 tweets <- gsub(" $", "", tweets)                 # Lagging blanks
 tweets <- gsub(" +", " ", tweets)                # General spaces (should just do all whitespaces no?)
-                                                 # tweets <- unique(tweets)  # Now get rid of duplicates!
+
+## Replace original message by clean tweets
+d$message <- tweets
+
+## TODO: MAKE DATE FIELD
 
 ## Get language
 d$lang <- textcat(tweets)
 d$lang[d$lang %in% c('scots')] <- 'english'
-x <- 8
+
 prop <- round(prop.table(table(ifelse(d$lang %in% c('english', 'french'), 1,0)))[1],2)
-sprintf("Proports of non english-french tweets : %.3f", prop)
+sprintf("Proportion of non english-french tweets : %.3f", prop)
 
 # Convert to tm corpus and use its API for some additional fun
 corpus <- Corpus(VectorSource(tweets[d$lang=='english']))  # Create corpus object
@@ -62,21 +67,28 @@ corpus <- tm_map(corpus, removeNumbers, mc.cores=1)
 corpus <- tm_map(corpus, stemDocument, mc.cores=1)
 
 # Remove the stems associated with our search terms!
-account_names <- c(account_names, unique(d$source))
+account_names <- unique(c(account_names, unique(d$source)))
 temp_words <- c("elxn42", "cdnpoli", "retweet", "elxn", "aug", "sep", "oct",
                 "client", "www", "twitter", "blackberri", "iphone", "hootsuit",
                 "web", "tweetdeck", "iphon", "com", "green", "ndp", "lpc",
                 "canadiangreen", "liber", "realchang", "android", "elizabethmay",
                 "trudeau", "mulcair", "readychang", "twimg", "tom", "ipad",
                 "temptrudeau", "chang", "justin", "harper", "stephen", "justin",
-                "canadian", "will", "harper", "candid", account_names)
+                "canadian", "will", "harper", "candid", "yyj", "today", "canada",
+                "gpc", "votegreen", "ago", "hour", "just", "want", "one", "make",
+                "get", "neet", "can", "say", "tpp", "last", "may", "qpgpc", "see",
+                "time", "teamtrudeau", "tmpm", "take", "tonight", "now", "watch",
+                "live", "day", "vancouver", "faceafacetva", "need", "let", "look",
+                account_names)
 
 corpus <- tm_map(corpus, removeWords, temp_words, mc.cores=1)
 
 # Visualize the corpus
-pal <- brewer.pal(8, "Dark2")
-wordcloud(corpus, min.freq=2, max.words = 150, random.order = TRUE, col = pal)
+pal <- brewer.pal(8, "Set1")
 
+pdf(paste0('reports/figures/', today, '_wordcloud.pdf'))
+wordcloud(corpus, min.freq=2, max.words = 150, random.order = TRUE, col = pal)
+dev.off()
 
 # Get the lengths and make sure we only create a DTM for tweets with
 # some actual content
@@ -96,7 +108,9 @@ result <- FindTopicsNumber(
   verbose = TRUE
 )
 
+pdf(paste0('reports/figures/', today, '_topics_diagnostic.pdf'))
 FindTopicsNumber_plot(result)
+dev.off()
 
 # Set the optimal number of topics
 SEED = 1 # Pick a random seed for replication
@@ -117,6 +131,18 @@ models <- list(
 # Do you see any themes you can label to these "topics" (lists of words)?
 lapply(models, terms, 10)
 
+write.csv(terms(models[[1]], 10), paste0('reports/', today, '_topics_top10.csv'), row.names=F)
+
 # matrix of tweet assignments to predominate topic on that tweet
 # for each of the models, in case you wanted to categorize them
 assignments <- sapply(models, topics)
+
+
+d$message <- tweets # Create corpus object
+d$lda_gibs <- NA
+
+eng <- subset(d, lang=='english')
+cbind(d[d$lang=='english' & doc_leng > 0,], as.data.frame(assignments)$Gibbs)
+
+dim(d[d$lang=='english',])
+
