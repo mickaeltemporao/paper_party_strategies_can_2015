@@ -5,7 +5,7 @@
 # Description:  Twitter Topic Modeling Using R
 # Version:      0.0.0.000
 # Created:      2016-10-17 20:15:03
-# Modified:     2016-12-06 12:00:26
+# Modified:     2016-12-06 15:20:24
 # Author:       Mickael Temporão, based on Bryan Goodrich TwitterTopics.R
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -23,49 +23,49 @@ library(textcat)
 source('settings.R')
 d <- openxlsx::read.xlsx('data/twitter_feeds_can2016.xlsx')
 
-#### Preprocess Tweets --------------------------------
-account_names <- gsub("([A-Za-z]+).*", "\\1", d$message) # Extract first word of sentence (account name)
 
-tweets <- d$message
-tweets <- gsub("pbs\\.twimg.+","",tweets)        # Remove source in tweest
-tweets <- iconv(tweets, to = "ASCII", sub = " ") # Convert to basic ASCII text to avoid silly characters
-tweets <- tolower(tweets)                        # Make everything consistently lower case
-tweets <- gsub("^(\\w+)", "", tweets)            # Remove first word of sentence (account name here)
-tweets <- gsub("^rt", " ", tweets)                # Remove the "RT" (retweet) so duplicates are duplicates
-tweets <- gsub("@\\w+", " ", tweets)             # Remove user names (all proper names if you're wise!)
-tweets <- gsub("http.+ |http.+$", " ", tweets)   # Remove links
-tweets <- gsub("[[:punct:]]", " ", tweets)       # Remove punctuation
-tweets <- gsub("[ |\t]{2,}", " ", tweets)        # Remove tabs
-tweets <- gsub("amp", " ", tweets)               # "&" is "&amp" in HTML, so after punctuation removed ...
-tweets <- gsub("^ ", "", tweets)                 # Leading blanks
-tweets <- gsub(" $", "", tweets)                 # Lagging blanks
-tweets <- gsub(" +", " ", tweets)                # General spaces (should just do all whitespaces no?)
-
-## Replace original message by clean tweets
-d$message <- tweets
+#### Preprocess Dataset --------------------------------
 
 ## MAKE DATE FIELD
 d$date  <- openxlsx::convertToDate(d$date)
 d$day   <- NULL
 d$month <- NULL
+## Subset tweets in campaign period
+d <- subset(d, date > as.Date("2015-08-3") & date < as.Date("2015-10-20"))
 
-## Get language
-d$lang <- textcat(tweets)
+## Clean tweets
+account_names <- gsub("([A-Za-z]+).*", "\\1", d$message) #  Extract first word of sentence (account name)
+tweets        <- d$message
+tweets        <- gsub("pbs\\.twimg.+","",tweets)         #  Remove source in tweest
+tweets        <- iconv(tweets, to = "ASCII", sub = " ")  #  Convert to basic ASCII text to avoid silly characters
+tweets        <- tolower(tweets)                         #  Make everything consistently lower case
+tweets        <- gsub("^(\\w+)", "", tweets)             #  Remove first word of sentence (account name here)
+tweets        <- gsub("^rt", " ", tweets)                #  Remove the "RT" (retweet) so duplicates are duplicates
+tweets        <- gsub("@\\w+", " ", tweets)              #  Remove user names (all proper names if you're wise!)
+tweets        <- gsub("http.+ |http.+$", " ", tweets)    #  Remove links
+tweets        <- gsub("[[:punct:]]", " ", tweets)        #  Remove punctuation
+tweets        <- gsub("[ |\t]{2,}", " ", tweets)         #  Remove tabs
+tweets        <- gsub("amp", " ", tweets)                #  "&" is "&amp" in HTML, so after punctuation removed ...
+tweets        <- gsub("^ ", "", tweets)                  #  Leading blanks
+tweets        <- gsub(" $", "", tweets)                  #  Lagging blanks
+tweets        <- gsub(" +", " ", tweets)                 #  General spaces (should just do all whitespaces no?)
+
+## Replace original message by clean tweets
+d$message <- tweets
+rm(tweets)
+
+## Get language of the tweets
+d$lang <- textcat(d$message)
 d$lang[d$lang %in% c('scots')] <- 'english'
-
 prop <- round(prop.table(table(ifelse(d$lang %in% c('english', 'french'), 1,0)))[1],2)
-sprintf("Proportion of non english-french tweets : %.3f", prop)
+sprintf("Proportion of non english-french tweets : %.2f", prop)
 
 # Convert to tm corpus and use its API for some additional fun
 corpus <- Corpus(VectorSource(d$message[d$lang=='english']))  # Create corpus object
-
 # Remove stop words. This could be greatly expanded!
-# Don't forget the mc.cores thing
 corpus <- tm_map(corpus, removeWords, stopwords("en"), mc.cores=1)
-
 # Remove numbers. This could have been done earlier, of course.
 corpus <- tm_map(corpus, removeNumbers, mc.cores=1)
-
 # Stem the words. Google if you don't understand
 corpus <- tm_map(corpus, stemDocument, mc.cores=1)
 
@@ -82,14 +82,11 @@ temp_words <- c("elxn42", "cdnpoli", "retweet", "elxn", "aug", "sep", "oct",
                 "get", "neet", "can", "say", "tpp", "last", "may", "qpgpc", "see",
                 "time", "teamtrudeau", "tmpm", "take", "tonight", "now", "watch",
                 "live", "day", "vancouver", "faceafacetva", "need", "let", "look",
-                "ready4chang",
-                account_names)
-
+                "ready4chang", "conservative", unique(d$source))
 corpus <- tm_map(corpus, removeWords, temp_words, mc.cores=1)
 
 # Visualize the corpus
 pal <- brewer.pal(8, "Set1")
-
 png(paste0('reports/figures/', today, '_wordcloud.png'))
 wordcloud(corpus, min.freq=2, max.words = 150, random.order = TRUE, col = pal)
 dev.off()
@@ -116,7 +113,7 @@ FindTopicsNumber_plot(result)
 dev.off()
 # Set the optimal number of topics
 SEED = 1 # Pick a random seed for replication
-k    = 6 # Let's start with 10 topics
+k    = 5 # Let's start with 10 topics
 # This might take a minute!
 models <- list(
     CTM       = CTM(dtm, k = k, control = list(seed = SEED, var = list(tol = 10^-4), em = list(tol = 10^-3))),
@@ -125,24 +122,18 @@ models <- list(
     Gibbs     = LDA(dtm, k = k, method = "Gibbs", control = list(seed = SEED, burnin = 1000,
                                                                  thin = 100,    iter = 1000))
 )
-
 # There you have it. Models now holds 4 topics. See the topicmodels API documentation for details
-
-# Top 10 terms of each topic for each model
-# Do you see any themes you can label to these "topics" (lists of words)?
 lapply(models, terms, 10)
-
 write.csv(terms(models[[1]], 10), paste0('reports/', today, '_topics_top10.csv'), row.names=F)
-
 # matrix of tweet assignments to predominate topic on that tweet
 # for each of the models, in case you wanted to categorize them
 assignments <- sapply(models, topics)
 
-
+doc_leng
 d$message <- tweets # Create corpus object
 d$lda_gibs <- NA
 
-eng <- subset(d, lang=='english')
-cbind(d[d$lang=='english' & !in.na(d$lang),], as.data.frame(assignments)$Gibbs)
+dim(d[d$lang=='english' & is.na(d$lang),])
+cbind(d[d$lang=='english' & !is.na(d$lang),], as.data.frame(assignments)$Gibbs)
 
 dim(d[d$lang=='english',])
