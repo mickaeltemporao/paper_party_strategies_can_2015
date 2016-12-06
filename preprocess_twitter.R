@@ -5,7 +5,7 @@
 # Description:  Twitter Topic Modeling Using R
 # Version:      0.0.0.000
 # Created:      2016-10-17 20:15:03
-# Modified:     2016-12-06 11:42:15
+# Modified:     2016-12-06 11:56:22
 # Author:       Mickael Temporão, based on Bryan Goodrich TwitterTopics.R
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -45,6 +45,8 @@ tweets <- gsub(" +", " ", tweets)                # General spaces (should just d
 d$message <- tweets
 
 ## TODO: MAKE DATE FIELD
+test <- openxlsx::convertToDate(d$date)
+d$date <- as.Date(as.character(d1$date), "%d%m%Y")
 
 ## Get language
 d$lang <- textcat(tweets)
@@ -54,7 +56,7 @@ prop <- round(prop.table(table(ifelse(d$lang %in% c('english', 'french'), 1,0)))
 sprintf("Proportion of non english-french tweets : %.3f", prop)
 
 # Convert to tm corpus and use its API for some additional fun
-corpus <- Corpus(VectorSource(tweets[d$lang=='english']))  # Create corpus object
+corpus <- Corpus(VectorSource(d$message[d$lang=='english']))  # Create corpus object
 
 # Remove stop words. This could be greatly expanded!
 # Don't forget the mc.cores thing
@@ -86,7 +88,7 @@ corpus <- tm_map(corpus, removeWords, temp_words, mc.cores=1)
 # Visualize the corpus
 pal <- brewer.pal(8, "Set1")
 
-pdf(paste0('reports/figures/', today, '_wordcloud.pdf'))
+png(paste0('reports/figures/', today, '_wordcloud.png'))
 wordcloud(corpus, min.freq=2, max.words = 150, random.order = TRUE, col = pal)
 dev.off()
 
@@ -107,15 +109,12 @@ result <- FindTopicsNumber(
   mc.cores = 2L,
   verbose = TRUE
 )
-
-pdf(paste0('reports/figures/', today, '_topics_diagnostic.pdf'))
+png(paste0('reports/figures/', today, '_topics_diagnostic.png'))
 FindTopicsNumber_plot(result)
 dev.off()
-
 # Set the optimal number of topics
 SEED = 1 # Pick a random seed for replication
 k    = 6 # Let's start with 10 topics
-
 # This might take a minute!
 models <- list(
     CTM       = CTM(dtm, k = k, control = list(seed = SEED, var = list(tol = 10^-4), em = list(tol = 10^-3))),
@@ -142,7 +141,6 @@ d$message <- tweets # Create corpus object
 d$lda_gibs <- NA
 
 eng <- subset(d, lang=='english')
-cbind(d[d$lang=='english' & doc_leng > 0,], as.data.frame(assignments)$Gibbs)
+cbind(d[d$lang=='english' & !in.na(d$lang),], as.data.frame(assignments)$Gibbs)
 
 dim(d[d$lang=='english',])
-
