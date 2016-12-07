@@ -2,7 +2,8 @@
 Descriptive analysis of party strategies during the 2015 Canadian Federal Campaign.
 
 ##TODO:
-- [] Add Folder Structure Description
+- [] Update Folder Structure in README
+- [] Twitter Analysis
 
 ##Summary
 ![Average direction of TV Ads by Party by Language](/reports/figures/20161115_tvads_neg_avg_by_party_by_lang.png)
