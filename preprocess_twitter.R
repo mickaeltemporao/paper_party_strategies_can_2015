@@ -5,7 +5,7 @@
 # Description:  Twitter Topic Modeling Using R
 # Version:      0.0.0.000
 # Created:      2016-10-17 20:15:03
-# Modified:     2016-12-06 15:20:24
+# Modified:     2016-12-07 08:39:15
 # Author:       Mickael Temporão, based on Bryan Goodrich TwitterTopics.R
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -21,7 +21,7 @@ library(SnowballC)
 library(textcat)
 
 source('settings.R')
-d <- openxlsx::read.xlsx('data/twitter_feeds_can2016.xlsx')
+d <- openxlsx::read.xlsx(paste0(data_path, 'twitter_feeds_can2016.xlsx'))
 
 
 #### Preprocess Dataset --------------------------------
@@ -81,8 +81,9 @@ temp_words <- c("elxn42", "cdnpoli", "retweet", "elxn", "aug", "sep", "oct",
                 "gpc", "votegreen", "ago", "hour", "just", "want", "one", "make",
                 "get", "neet", "can", "say", "tpp", "last", "may", "qpgpc", "see",
                 "time", "teamtrudeau", "tmpm", "take", "tonight", "now", "watch",
-                "live", "day", "vancouver", "faceafacetva", "need", "let", "look",
-                "ready4chang", "conservative", unique(d$source))
+                "live", "day", "vancouv", "faceafacetva", "need", "let", "look",
+                "ready4chang", "conservative", "munkdeb", "parti", "elizabeth",
+                "greenparty", "greenparti", "year", "macdeb", unique(d$source))
 corpus <- tm_map(corpus, removeWords, temp_words, mc.cores=1)
 
 # Visualize the corpus
@@ -93,6 +94,7 @@ dev.off()
 
 # Get the lengths and make sure we only create a DTM for tweets with
 # some actual content
+#TODO: add meta information
 doc_leng <- rowSums(as.matrix(DocumentTermMatrix(corpus)))
 dtm <- DocumentTermMatrix(corpus[doc_leng > 0])
 # model <- LDA(dtm, 10)  # Go ahead and test a simple model if you want
@@ -113,7 +115,7 @@ FindTopicsNumber_plot(result)
 dev.off()
 # Set the optimal number of topics
 SEED = 1 # Pick a random seed for replication
-k    = 5 # Let's start with 10 topics
+k    = 7 # Let's start with 10 topics
 # This might take a minute!
 models <- list(
     CTM       = CTM(dtm, k = k, control = list(seed = SEED, var = list(tol = 10^-4), em = list(tol = 10^-3))),

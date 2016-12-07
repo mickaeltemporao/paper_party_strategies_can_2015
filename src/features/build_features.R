@@ -5,12 +5,13 @@
 # Description:  Opens data sets and preprocesses them for the analysis
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-11-15 07:40:09
+# Modified:     2016-12-07 08:36:31
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
+source('settings.R')
 
 #### FUNS --------------------------------
 getData <- function (x) {
@@ -31,7 +32,7 @@ getData <- function (x) {
 }
 
 #### Loading Data Sets --------------------------------
-temp  <- list.files(path='data', pattern="TVADS", full.names=T)
+temp  <- list.files(path=data_path, pattern="TVADS", full.names=T)
 #temp  <- list.files(path='data', pattern="*.xlsx", full.names=T)
 #files <- lapply(temp, readxl::read_excel)
 

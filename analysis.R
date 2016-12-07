@@ -5,13 +5,14 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-12-06 15:25:17
+# Modified:     2016-12-07 08:35:31
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
 rm(list=ls())
+source('settings.R')
 src = list.files('src/features', pattern="*.R")
 sapply(paste0('src/features/',src), source, .GlobalEnv)
 span <- 3
