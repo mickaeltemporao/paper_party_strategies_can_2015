@@ -1,64 +1,26 @@
 #!/usr/bin/env Rscript
 # ------------------------------------------------------------------------------
 # Title:        TODO: (add title)
-# Filename:     TwitterTopics.r
-# Description:  Twitter Topic Modeling Using R
+# Filename:     twitter_analysis.R
+# Description:  TODO: (write me)
 # Version:      0.0.0.000
-# Created:      2016-10-17 20:15:03
-# Modified:     2016-12-07 08:39:15
-# Author:       Mickael Temporão, based on Bryan Goodrich TwitterTopics.R
+# Created:      2016-12-10 11:22:02
+# Modified:     2016-12-10 12:06:12
+# Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
-library(twitteR)
-library(NLP)
-library(tm)
+library(quanteda)
 library(RColorBrewer)
 library(wordcloud)
 library(topicmodels)
 library(SnowballC)
-library(textcat)
-
-source('settings.R')
-d <- openxlsx::read.xlsx(paste0(data_path, 'twitter_feeds_can2016.xlsx'))
 
 
-#### Preprocess Dataset --------------------------------
-
-## MAKE DATE FIELD
-d$date  <- openxlsx::convertToDate(d$date)
-d$day   <- NULL
-d$month <- NULL
-## Subset tweets in campaign period
-d <- subset(d, date > as.Date("2015-08-3") & date < as.Date("2015-10-20"))
-
-## Clean tweets
-account_names <- gsub("([A-Za-z]+).*", "\\1", d$message) #  Extract first word of sentence (account name)
-tweets        <- d$message
-tweets        <- gsub("pbs\\.twimg.+","",tweets)         #  Remove source in tweest
-tweets        <- iconv(tweets, to = "ASCII", sub = " ")  #  Convert to basic ASCII text to avoid silly characters
-tweets        <- tolower(tweets)                         #  Make everything consistently lower case
-tweets        <- gsub("^(\\w+)", "", tweets)             #  Remove first word of sentence (account name here)
-tweets        <- gsub("^rt", " ", tweets)                #  Remove the "RT" (retweet) so duplicates are duplicates
-tweets        <- gsub("@\\w+", " ", tweets)              #  Remove user names (all proper names if you're wise!)
-tweets        <- gsub("http.+ |http.+$", " ", tweets)    #  Remove links
-tweets        <- gsub("[[:punct:]]", " ", tweets)        #  Remove punctuation
-tweets        <- gsub("[ |\t]{2,}", " ", tweets)         #  Remove tabs
-tweets        <- gsub("amp", " ", tweets)                #  "&" is "&amp" in HTML, so after punctuation removed ...
-tweets        <- gsub("^ ", "", tweets)                  #  Leading blanks
-tweets        <- gsub(" $", "", tweets)                  #  Lagging blanks
-tweets        <- gsub(" +", " ", tweets)                 #  General spaces (should just do all whitespaces no?)
-
-## Replace original message by clean tweets
-d$message <- tweets
-rm(tweets)
-
-## Get language of the tweets
-d$lang <- textcat(d$message)
-d$lang[d$lang %in% c('scots')] <- 'english'
-prop <- round(prop.table(table(ifelse(d$lang %in% c('english', 'french'), 1,0)))[1],2)
-sprintf("Proportion of non english-french tweets : %.2f", prop)
+#### Load the datasets and dictionaries
+source('src/features/build_twitter_features.R')
+dict_fr <- dictionary(file = "frlsd.cat", format = "wordstat")
 
 # Convert to tm corpus and use its API for some additional fun
 corpus <- Corpus(VectorSource(d$message[d$lang=='english']))  # Create corpus object

@@ -5,7 +5,7 @@
 # Description:  Installs and loads requirred libraries
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:14:49
-# Modified:     2016-11-01 12:26:10
+# Modified:     2016-12-10 11:36:19
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -14,7 +14,8 @@
 list_packages <- c(
   "dplyr",
   "ggplot2",
-  "ggthemes"
+  "ggthemes",
+  "textcat"
 )
 
 to_install <- list_packages[!(list_packages %in% installed.packages()[,"Package"])]
