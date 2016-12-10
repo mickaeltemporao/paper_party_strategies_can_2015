@@ -1,6 +1,7 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <dictionary style="Lexicoder" name="policy_agendas">
-<cnode name="macroeconomics">
+<cnode name="Policy Agendas" desc="Policy Agendas">
+<cnode name="macroeconomics" desc="">
 <pnode name=" AGGREGATE DEMAND "></pnode>
 <pnode name=" AGGREGATE SUPPLY "></pnode>
 <pnode name=" BUSINESS CYCLE"></pnode>
@@ -349,7 +350,7 @@
 <pnode name=" SOFTWOOD "></pnode>
 <pnode name=" WOOD "></pnode>
 </cnode>
-<cnode name="labour">	
+<cnode name="labour">
 <pnode name=" CPP "></pnode>
 <pnode name=" QPP "></pnode>
 <pnode name=" QPIP "></pnode>
@@ -1458,5 +1459,5 @@
 <pnode name=" YAHWEH "></pnode>
 <pnode name=" ZOROASTRIAN"></pnode>
 </cnode>
+</cnode>
 </dictionary>
-

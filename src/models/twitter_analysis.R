@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-12-10 11:22:02
-# Modified:     2016-12-10 12:06:12
+# Modified:     2016-12-10 16:12:49
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -20,7 +20,37 @@ library(SnowballC)
 
 #### Load the datasets and dictionaries
 source('src/features/build_twitter_features.R')
-dict_fr <- dictionary(file = "frlsd.cat", format = "wordstat")
+dict <- dictionary(file = "src/dictionaries/policy_agendas_english.ykd")
+
+
+
+readYKdict <- function(path){
+    if (!requireNamespace("XML", quietly = TRUE))
+        stop("You must have package XML installed to parse Yoshikoder dictionary files.")
+
+    xx <- XML::xmlParse(path)
+    catnames <- XML::xpathSApply(xx, "/dictionary/cnode/cnode",
+                                 XML::xmlGetAttr, name="name")
+    get_patterns_in_subtree <- function(x){
+        XML::xpathSApply(x, ".//pnode", XML::xmlGetAttr, name="name")
+    }
+    cats <- XML::getNodeSet(xx, "/dictionary/cnode/cnode")
+    stats::setNames(lapply(cats, get_patterns_in_subtree), catnames)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Convert to tm corpus and use its API for some additional fun
 corpus <- Corpus(VectorSource(d$message[d$lang=='english']))  # Create corpus object
