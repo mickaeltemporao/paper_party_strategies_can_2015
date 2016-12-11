@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-12-10 11:47:56
-# Modified:     2016-12-10 12:04:15
+# Modified:     2016-12-10 16:25:38
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -19,3 +19,6 @@ data$lang <- textcat::textcat(data$message)
 data$lang[data$lang %in% c('scots')] <- 'english'
 prop <- round(prop.table(table(ifelse(data$lang %in% c('english', 'french'), 1,0)))[1],2)
 sprintf("Proportion of non english-french tweets : %.2f", prop)
+
+## Filter only english tweets
+data <- subset(data, lang=='english')

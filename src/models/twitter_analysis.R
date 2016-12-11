@@ -5,92 +5,43 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-12-10 11:22:02
-# Modified:     2016-12-10 16:12:49
+# Modified:     2016-12-10 19:03:40
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
 # Licensed under the GPL-2 < https://www.gnu.org/licenses/gpl-2.0.txt >
 # ------------------------------------------------------------------------------
-library(quanteda)
 library(RColorBrewer)
-library(wordcloud)
-library(topicmodels)
 library(SnowballC)
+library(quanteda)
+library(topicmodels)
 
 
-#### Load the datasets and dictionaries
+#### Load the datasets/dictionaries --------------------------------
 source('src/features/build_twitter_features.R')
-dict <- dictionary(file = "src/dictionaries/policy_agendas_english.ykd")
+source('src/dictionaries/removed_words.R')
+policy_agendas <- dictionary(file = "src/dictionaries/policy_agendas_english.ykd")
 
 
-
-readYKdict <- function(path){
-    if (!requireNamespace("XML", quietly = TRUE))
-        stop("You must have package XML installed to parse Yoshikoder dictionary files.")
-
-    xx <- XML::xmlParse(path)
-    catnames <- XML::xpathSApply(xx, "/dictionary/cnode/cnode",
-                                 XML::xmlGetAttr, name="name")
-    get_patterns_in_subtree <- function(x){
-        XML::xpathSApply(x, ".//pnode", XML::xmlGetAttr, name="name")
-    }
-    cats <- XML::getNodeSet(xx, "/dictionary/cnode/cnode")
-    stats::setNames(lapply(cats, get_patterns_in_subtree), catnames)
-}
+#### Create Corpus --------------------------------
+twitter_corpus <- corpus(data, text_field= "message")
+summary(twitter_corpus, 5)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Convert to tm corpus and use its API for some additional fun
-corpus <- Corpus(VectorSource(d$message[d$lang=='english']))  # Create corpus object
-# Remove stop words. This could be greatly expanded!
-corpus <- tm_map(corpus, removeWords, stopwords("en"), mc.cores=1)
-# Remove numbers. This could have been done earlier, of course.
-corpus <- tm_map(corpus, removeNumbers, mc.cores=1)
-# Stem the words. Google if you don't understand
-corpus <- tm_map(corpus, stemDocument, mc.cores=1)
-
-# Remove the stems associated with our search terms!
-account_names <- unique(c(account_names, unique(d$source)))
-temp_words <- c("elxn42", "cdnpoli", "retweet", "elxn", "aug", "sep", "oct",
-                "client", "www", "twitter", "blackberri", "iphone", "hootsuit",
-                "web", "tweetdeck", "iphon", "com", "green", "ndp", "lpc",
-                "canadiangreen", "liber", "realchang", "android", "elizabethmay",
-                "trudeau", "mulcair", "readychang", "twimg", "tom", "ipad",
-                "temptrudeau", "chang", "justin", "harper", "stephen", "justin",
-                "canadian", "will", "harper", "candid", "yyj", "today", "canada",
-                "gpc", "votegreen", "ago", "hour", "just", "want", "one", "make",
-                "get", "neet", "can", "say", "tpp", "last", "may", "qpgpc", "see",
-                "time", "teamtrudeau", "tmpm", "take", "tonight", "now", "watch",
-                "live", "day", "vancouv", "faceafacetva", "need", "let", "look",
-                "ready4chang", "conservative", "munkdeb", "parti", "elizabeth",
-                "greenparty", "greenparti", "year", "macdeb", unique(d$source))
-corpus <- tm_map(corpus, removeWords, temp_words, mc.cores=1)
+#### Top Features --------------------------------
+wc_dfm <- dfm(twitter_corpus, stem = F, remove = c(rm_words, stopwords("english")))
+topfeatures(wc_dfm, 50)
 
 # Visualize the corpus
-pal <- brewer.pal(8, "Set1")
 png(paste0('reports/figures/', today, '_wordcloud.png'))
-wordcloud(corpus, min.freq=2, max.words = 150, random.order = TRUE, col = pal)
+plot(wc_dfm,
+     min.freq=2,
+     max.words = 100,
+     col = brewer.pal(8, "Set1"))
 dev.off()
 
-# Get the lengths and make sure we only create a DTM for tweets with
-# some actual content
-#TODO: add meta information
-doc_leng <- rowSums(as.matrix(DocumentTermMatrix(corpus)))
-dtm <- DocumentTermMatrix(corpus[doc_leng > 0])
-# model <- LDA(dtm, 10)  # Go ahead and test a simple model if you want
 
+# XXX
 # Select number of topics for LDA model
 library("ldatuning")
 result <- FindTopicsNumber(
