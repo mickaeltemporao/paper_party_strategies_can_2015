@@ -1,36 +1,17 @@
 # Party Strategies of the 2015 Canadian Federal Campaign
-Descriptive analysis of party strategies during the 2015 Canadian Federal Campaign.
+Topic and sentiment analysis of the 2015 Canadian Federal Campaign.
 
-##TODO:
-- [] Update Folder Structure in README
-- [] Twitter Analysis
+## Canadian Television Ads Analysis
+![Average direction of TV Ads by Party by Language](/reports/figures/tvads/20161115_tvads_neg_avg_by_party_by_lang.png)
 
-##Summary
-![Average direction of TV Ads by Party by Language](/reports/figures/20161115_tvads_neg_avg_by_party_by_lang.png)
+## Topics used by Canadian Political Parties on Twitter
+![Twitter Topics during the campaign period](reports/figures/twitter/20161211_0_twitter_topics.png)
 
-## Data available:
-1. Ads
-    * TV Ads
-    * Newspaper Ads
-2. TV Debates
-    * TVA
-    * RC
-    - MCL
-    - GM
-    - MD
-3. Expert surveys
+## Topics by party
+![Twitter Topics during the campaign period](reports/figures/twitter/20161211_1_twitter_topics_by_party.png)
 
-## Analysis:
-1. Plots
-    * Global plots for each data source
-        * Object Plot
-        * Actor Plot
-    * TV Ads
-        * Pre Event
-            * Object Plot
-            * Actor Plot
-        * Post Event
-            * Object Plot
-            * Actor Plot
+## Topics per tweet
+![Twitter Topics per tweet](reports/figures/20161212_2_twitter_topics_all_ts_by_party.png)
 
-2. Tables of parties targeted
+## Top 5 topics per tweet by party
+![Top 5 Topics per tweet by party](reports/figures/twitter/20161213_3_twitter_topics_all_ts_by_party.png)
