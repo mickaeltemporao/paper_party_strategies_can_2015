@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-12-10 11:22:02
-# Modified:     2016-12-10 19:03:40
+# Modified:     2016-12-12 21:26:33
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -39,6 +39,13 @@ plot(wc_dfm,
      max.words = 100,
      col = brewer.pal(8, "Set1"))
 dev.off()
+
+
+#### Extracting Topics --------------------------------
+topics_dfm <- dfm(twitter_corpus,
+                  dictionary = "policy_agendas",
+                  remove = c(rm_words, stopwords("english")),
+                  stem = F)
 
 
 # XXX
