@@ -2,7 +2,7 @@
 Topic and sentiment analysis of the 2015 Canadian Federal Campaign.
 
 ## Canadian Television Ads Analysis
-![Average direction of TV Ads by Party by Language](/reports/figures/tvads/20161115_tvads_neg_avg_by_party_by_lang.png)
+![Average direction of TV Ads by Party by Language](/reports/figures/tvads/20161130_tvads_neg_avg_by_party_by_lang.png)
 
 ## Topics used by Canadian Political Parties on Twitter
 ![Twitter Topics during the campaign period](reports/figures/twitter/20161211_0_twitter_topics.png)
