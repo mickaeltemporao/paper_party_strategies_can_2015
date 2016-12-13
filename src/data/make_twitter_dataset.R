@@ -5,7 +5,7 @@
 # Description:  Preprocesses Twitter Datasets
 # Version:      0.0.0.000
 # Created:      2016-10-17 20:15:03
-# Modified:     2016-12-10 11:51:25
+# Modified:     2016-12-13 06:52:50
 # Author:       Mickael Temporão
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -42,4 +42,16 @@ tweets        <- gsub(" +", " ", tweets)                 #  General spaces (shou
 
 ## Replace original message by clean tweets
 data$message <- tweets
+
+# Replace Party Candidates by Party Names
+data$source <- gsub("Harper", "CPC", data$source)
+data$source <- gsub("Trudeau", "LPC", data$source)
+data$source <- gsub("Mulcair", "NDP", data$source)
+data$source <- gsub("May", "GPC", data$source)
+data$source <- gsub("Green", "GPC", data$source)
+
+# Filter only for English speaking parties
+parties <- c("CPC", "GPC", "LPC", "NDP")
+data <- data[data$source %in% parties,]
+
 rm(tweets)

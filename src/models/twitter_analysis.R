@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-12-10 11:22:02
-# Modified:     2016-12-13 07:27:38
+# Modified:     2016-12-13 09:08:09
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -58,19 +58,17 @@ library(ggthemes)
 library(tidyr)
 
 ## Prepare data to tidy format ----------------
-to_plot <- data %>%
+plot_data <- data %>%
   dplyr::select(id, source, date, contains("topic")) %>%
-  gather(key=topic, value=value, -id, -source, -date)
-to_plot$topic <- gsub("topic_", "", to_plot$topic)
-to_plot$topic <- gsub("_|-", "", to_plot$topic)
+  gather(key=topic, value=value, -id, -source, -date) %>%
+  dplyr::filter(value == 1)
+plot_data$topic <- gsub("topic_", "", plot_data$topic)
+plot_data$topic <- gsub("_|-", "", plot_data$topic)
 
 ## Bar Plots ----------------
 # Average topics
-bar_plot <- to_plot %>%
-  dplyr::filter(value == 1)
-
-ggplot(bar_plot, aes(x=topic)) +
-  geom_bar() +
+ggplot(plot_data, aes(x=topic)) +
+  geom_bar(col='black', size=0.3) +
   theme_fivethirtyeight() +
   ggtitle('Topics per tweet') +
   scale_x_discrete(label=abbreviate) +
@@ -81,8 +79,8 @@ ggplot(bar_plot, aes(x=topic)) +
 ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_twitter_topics.png'), width = 10, height = 3)
 
 # Average topics by party
-ggplot(bar_plot, aes(x=topic)) +
-  geom_bar() +
+ggplot(plot_data, aes(x=topic)) +
+  geom_bar(col='black', size=0.3) +
   theme_fivethirtyeight() +
   ggtitle('Topics per tweet') +
   scale_x_discrete(label=abbreviate) +
@@ -93,30 +91,45 @@ ggplot(bar_plot, aes(x=topic)) +
     plot.background = element_rect(fill = "white"))
 ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_twitter_topics_by_party.png'), width = 11, height = 7)
 
-## Topics Time Series all parties
-
-## Topics Time Series by party
-
-# Avg Direction per day
-d <- data %>% select(-adid, -objectparty) %>%
-  group_by(unique_id, date, actorparty) %>%
-  arrange(date) %>% summarize(direction=mean(direction))
-ggplot(d, aes(x=date, y=direction)) +
-  geom_jitter(aes(color=actorparty), size = 4, alpha=0.4)+
-  geom_smooth(aes(color=actorparty), span = span, se=F, size=2) +
+## Time Series ----------------
+# All topics over time
+ggplot(plot_data, aes(x=date, fill=topic)) +
+  geom_bar() +
   theme_fivethirtyeight() +
-  ggtitle('Average Direction per Ad per Party') +
-  scale_colour_manual(name  ="",
-                      values=c("#135895", "#d71920", "#f37021"),
-                      breaks=c("CPC", "NDP", "LPC"),
-                      labels=c("CPC", "NDP", "LPC")
-                      ) +
+  ggtitle('Topics per tweet during campaign') +
   theme(
     legend.background= element_rect(fill = "white"),
     panel.background = element_rect(fill = "white"),
     plot.background = element_rect(fill = "white"))
-ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_avg_by_party.png'), width = 10, height = 7)
+ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_twitter_topics_all_ts_byparty.png'))
 
+# Filter top 5 topics
+temp <- sort(table(plot_data$topic), decreasing=T)[1:5]
+top <- names(temp)
+
+# All topics over time by party
+ggplot(dplyr::filter(plot_data, topic %in% top), aes(x=date, fill=topic)) +
+  geom_bar(width=1, col='black', size=0.15) +
+  theme_fivethirtyeight() +
+  ggtitle('Topics per tweet during campaign by party') +
+  facet_grid(source ~ .) +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_twitter_topics_all_ts_by_party.png'))
+
+# All topics over time by party
+ggplot(dplyr::filter(plot_data, topic %in% top), aes(x=date, fill=topic)) +
+  geom_bar(width=1, col='black', size=0.15, position="fill") +
+  theme_fivethirtyeight() +
+  ggtitle('Proportion of Topics per tweet during campaign by party') +
+  facet_grid(source ~ .) +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_twitter_topics_all_ts_by_party_prop.png'))
 
 # XXX
 # Select number of topics for LDA model
