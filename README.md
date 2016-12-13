@@ -13,5 +13,5 @@ Topic and sentiment analysis of the 2015 Canadian Federal Campaign.
 ## Topics per tweet
 ![Twitter Topics per tweet](reports/figures/twitter/20161212_2_twitter_topics_all_ts_by_party.png)
 
-## Top 5 topics per tweet by party
+## TODO: Filter Top 5 topics by party
 ![Top 5 Topics per tweet by party](reports/figures/twitter/20161213_3_twitter_topics_all_ts_by_party.png)
