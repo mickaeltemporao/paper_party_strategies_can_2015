@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-12-10 11:22:02
-# Modified:     2016-12-12 21:26:33
+# Modified:     2016-12-13 04:59:54
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -20,11 +20,11 @@ library(topicmodels)
 #### Load the datasets/dictionaries --------------------------------
 source('src/features/build_twitter_features.R')
 source('src/dictionaries/removed_words.R')
-policy_agendas <- dictionary(file = "src/dictionaries/policy_agendas_english.ykd")
+policy_agendas <- dictionary(file = "src/dictionaries/policy_agendas.lc3")
 
 
 #### Create Corpus --------------------------------
-twitter_corpus <- corpus(data, text_field= "message")
+twitter_corpus <- corpus(data[1:500,], text_field= "message")
 summary(twitter_corpus, 5)
 
 
@@ -43,7 +43,7 @@ dev.off()
 
 #### Extracting Topics --------------------------------
 topics_dfm <- dfm(twitter_corpus,
-                  dictionary = "policy_agendas",
+                  dictionary = policy_agendas,
                   remove = c(rm_words, stopwords("english")),
                   stem = F)
 
