@@ -5,7 +5,7 @@
 # Description:  Descriptive statistics of party strategies in Canada 2015
 # Version:      0.0.0.000
 # Created:      2016-05-09 11:06:35
-# Modified:     2016-12-07 08:35:31
+# Modified:     2016-12-10 11:31:52
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -13,18 +13,20 @@
 # ------------------------------------------------------------------------------
 rm(list=ls())
 source('settings.R')
-src = list.files('src/features', pattern="*.R")
-sapply(paste0('src/features/',src), source, .GlobalEnv)
+source('requirements.R')
+source('src/features/clean_medw.R')
+#src = list.files('src/features', pattern="*.R")
+#sapply(paste0('src/features/',src), source, .GlobalEnv)
 span <- 3
 # 1. Analysis of all data sets available ---------------------------------------
 # voir s'il y a une tendance dans le temps
 # est-ce que cette tendance est distincte entre les francais et anglais
 
-Data <- Data[!is.na(Data$direction),]
-Data <- subset(Data, actorparty %in% c('CPC', 'NDP', 'LPC'))
+data <- data[!is.na(data$direction),]
+data <- subset(data, actorparty %in% c('CPC', 'NDP', 'LPC'))
 
 # Avg Direction per day
-d <- Data %>% select(-adid, -objectparty) %>%
+d <- data %>% select(-adid, -objectparty) %>%
   group_by(unique_id, date, actorparty) %>%
   arrange(date) %>% summarize(direction=mean(direction))
 ggplot(d, aes(x=date, y=direction)) +
@@ -44,7 +46,7 @@ ggplot(d, aes(x=date, y=direction)) +
 ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_avg_by_party.png'), width = 10, height = 7)
 
 # Negative Count per ad per day
-d <- Data %>% select(-adid, -objectparty) %>%
+d <- data %>% select(-adid, -objectparty) %>%
   group_by(unique_id, date, actorparty) %>% dplyr::filter(direction==-1) %>%
   summarize(target = n())
 ggplot(d, aes(x=date, y=target)) +
@@ -64,7 +66,7 @@ ggplot(d, aes(x=date, y=target)) +
 ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_count_by_party.png'), width = 10, height = 7)
 
 # Negative proportion per ad per day
-d <- Data %>% select(-adid, -objectparty) %>%
+d <- data %>% select(-adid, -objectparty) %>%
   group_by(unique_id, date, actorparty, direction) %>%
   summarize(n = n()) %>%
   mutate(target = round(n / sum(n),2)) %>%
@@ -88,7 +90,7 @@ ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_prop
 
 
 # Avg Direction per day per by language
-d <- Data %>% select(-adid, -objectparty) %>%
+d <- data %>% select(-adid, -objectparty) %>%
   group_by(unique_id, date, actorparty, language) %>%
   arrange(date) %>% summarize(direction=mean(direction))
 ggplot(d, aes(x=date, y=direction)) +
@@ -108,7 +110,7 @@ ggplot(d, aes(x=date, y=direction)) +
 ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_avg_by_party_by_lang.png'), width = 10, height = 7)
 
 # Negative Count per ad per day by language
-d <- Data %>% select(-adid, -objectparty) %>%
+d <- data %>% select(-adid, -objectparty) %>%
   group_by(unique_id, date, actorparty, language) %>% dplyr::filter(direction==-1) %>%
   summarize(target = n())
 ggplot(d, aes(x=date, y=target)) +
@@ -128,8 +130,8 @@ ggplot(d, aes(x=date, y=target)) +
 ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_count_by_party_by_lang.png'), width = 10, height = 7)
 
 # Negative proportion per ad per day
-info <- Data %>% select(unique_id, language) %>% unique
-d <- Data %>% select(-adid, -objectparty) %>%
+info <- data %>% select(unique_id, language) %>% unique
+d <- data %>% select(-adid, -objectparty) %>%
   group_by(unique_id, date, actorparty, direction) %>%
   summarize(n = n()) %>%
   mutate(target = round(n / sum(n),2)) %>%
@@ -154,51 +156,51 @@ ggsave(paste0('reports/figures/', format(Sys.time(), "%Y%m%d"), '_tvads_neg_prop
 
 
 # Direction of quasi sentences
-ggplot(Data, aes(actorparty)) +
+ggplot(data, aes(actorparty)) +
   geom_bar(aes(fill=direction))
 ggsave(paste0('reports/figures/tvads_sent_count_dir.png'), width = 7, height = 7)
 
-ggplot(Data, aes(actorparty)) +
+ggplot(data, aes(actorparty)) +
   geom_bar(aes(fill=direction), position='fill')
 ggsave(paste0('reports/figures/tvads_sent_prop_dir.png'), width = 7, height = 7)
 
 # Language of quasi sentences
-ggplot(Data, aes(actorparty)) +
+ggplot(data, aes(actorparty)) +
   geom_bar(aes(fill=language))
 ggsave(paste0('reports/figures/tvads_sent_count_lang.png'), width = 7, height = 7)
 
-ggplot(Data, aes(actorparty)) +
+ggplot(data, aes(actorparty)) +
   geom_bar(aes(fill=language), position='fill') +
 ggsave(paste0('reports/figures/tvads_sent_prop_lang.png'), width = 7, height = 7)
 
 #
-ggplot(filter(Data, language=='en'), aes(actorparty)) +
+ggplot(filter(data, language=='en'), aes(actorparty)) +
   geom_bar(aes(fill=direction))
 ggsave(paste0('reports/figures/tvads_sent_count_dir_en.png'), width = 7, height = 7)
 
-ggplot(filter(Data, language=='fr'), aes(actorparty)) +
+ggplot(filter(data, language=='fr'), aes(actorparty)) +
   geom_bar(aes(fill=direction))
 ggsave(paste0('reports/figures/tvads_sent_count_dir_fr.png'), width = 7, height = 7)
 
 #
-ggplot(filter(Data, language=='fr'), aes(actorparty)) +
+ggplot(filter(data, language=='fr'), aes(actorparty)) +
   geom_bar(aes(fill=direction), position='fill')
 ggsave(paste0('reports/figures/tvads_sent_prop_dir_fr.png'), width = 7, height = 7)
 
-ggplot(filter(Data, language=='en'), aes(actorparty)) +
+ggplot(filter(data, language=='en'), aes(actorparty)) +
   geom_bar(aes(fill=direction), position='fill')
 ggsave(paste0('reports/figures/tvads_sent_prop_dir_en.png'), width = 7, height = 7)
 
 
 ### Actor Party
 object  <- c('actorparty', 'objectparty') # i <- object[1]
-type    <- unique(Data$type_source) # j <- type[1]
+type    <- unique(data$type_source) # j <- type[1]
 figure  <- 'pos_neg'
 
 #### General plots for actorparty, objectparty with counts
 for (i in object) {
   for (j in type) {
-      plot_data <- Data %>%
+      plot_data <- data %>%
         rename_(key=i) %>%
         filter(key %in% c("BQ", "CPC", "GPC", "LPC", "NDP")) %>%
         group_by(unique_id, key, language, direction) %>%
@@ -228,7 +230,7 @@ for (i in object) {
 #### General plots for actorparty, objectparty with proportions
 for (i in object) {
   for (j in type) {
-      plot_data <- filter(Data, type_source==j, language!=99) %>%
+      plot_data <- filter(data, type_source==j, language!=99) %>%
         rename_(key=i) %>% filter(key %in% c("BQ", "CPC", "GPC", "LPC", "NDP")) %>%
         group_by(key, language) %>% summarise (n = n()) %>%
         arrange(key, language) %>%
@@ -257,7 +259,7 @@ for (i in object) {
 
 #### Box plot and table for expert surveys
 j <- 'Experts'
-plot_data <- subset(Data, type_source==j) %>% group_by(party)
+plot_data <- subset(data, type_source==j) %>% group_by(party)
 
 output <- round(prop.table(table(Actors=plot_data$party, Target=plot_data$q2), 1), 2)
 print(output)
@@ -277,7 +279,7 @@ ggsave(paste0('figs/boxplot', '_experts_q1', '_', '.pdf'), width = 7, height = 7
 #### Tables
 # Negative sentences targetting other parties
 for (j in type) {
-  table_data <- filter(Data,type_source==j, language=='Negative', actorparty!=99, objectparty!=99) %>%
+  table_data <- filter(data,type_source==j, language=='Negative', actorparty!=99, objectparty!=99) %>%
     mutate(targeting_others = ifelse(objectparty == actorparty, 0, 1)) %>%
     filter(targeting_others == 1)
   output <- round(prop.table(table(Actors=table_data$actorparty, Target=table_data$objectparty ), 1),2)
@@ -286,8 +288,8 @@ for (j in type) {
 }
 
 j <- 'Ads_TV'
-for (i in unique(Data$post)) {
-  table_data <- filter(Data,type_source==j, post ==i, language=='Negative', actorparty!=99, objectparty!=99) %>%
+for (i in unique(data$post)) {
+  table_data <- filter(data,type_source==j, post ==i, language=='Negative', actorparty!=99, objectparty!=99) %>%
     mutate(targeting_others = ifelse(objectparty == actorparty, 0, 1)) %>%
     filter(targeting_others == 1)
   output <- round(prop.table(table(Actors=table_data$actorparty, Target=table_data$objectparty ), 1),2)
@@ -295,11 +297,11 @@ for (i in unique(Data$post)) {
   write.csv(output, paste0('figs/tables/', j,'_xtarget_yactors', ifelse(i==1, 'post', 'pre'), '.csv'))
 }
 
-# Data summaries sentences by ads by party
-Data <- tbl_df(Data)
+# data summaries sentences by ads by party
+data <- tbl_df(data)
 
 # TV Ads summaries
-output <- Data %>% filter(type_source=='Ads_TV') %>%
+output <- data %>% filter(type_source=='Ads_TV') %>%
   select(actorparty, unique_id) %>%
   group_by(actorparty, unique_id) %>%
   summarise(count = n()) %>%
@@ -312,7 +314,7 @@ write.csv(output, paste0('figs/tables/summaries_', 'Ads_TV', '.csv'))
 # Debates summaries
 debs <- type[2:4]
 for (j in debs) {
-  output <- Data %>% filter(type_source == j) %>% select(actorparty, language) %>%
+  output <- data %>% filter(type_source == j) %>% select(actorparty, language) %>%
     group_by(actorparty, language) %>%
     summarise(count = n())
   print(output)

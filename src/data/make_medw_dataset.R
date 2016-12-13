@@ -1,11 +1,11 @@
 #!/usr/bin/env Rscript
 # ------------------------------------------------------------------------------
-# Title:        Data preprocessing script
+# Title:        Make MEDW Dataset
 # Filename:     test.R
-# Description:  Opens data sets and preprocesses them for the analysis
+# Description:  Preprocesses MEDW Datasets
 # Version:      0.0.0.000
 # Created:      2016-05-05 10:41:06
-# Modified:     2016-12-07 08:41:03
+# Modified:     2016-12-10 11:46:48
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -13,7 +13,8 @@
 # ------------------------------------------------------------------------------
 source('settings.R')
 
-#### Loading Data Sets --------------------------------
+
+#### Loading data Sets --------------------------------
 temp  <- list.files(path=data_path, pattern="TVADS", full.names=T)
 #temp  <- list.files(path='data', pattern="*.xlsx", full.names=T)
 #files <- lapply(temp, readxl::read_excel)
@@ -58,40 +59,40 @@ d1$date <- as.Date(as.character(d1$date), "%d%m%Y")
 # )
 
 # Convert files to a global data.frame with all data types
-#Data <- plyr::rbind.fill(files)
+#data <- plyr::rbind.fill(files)
 
 # Create type of data variable in Global data.frame
 #data_type <- stringr::str_extract(names(files), "[A-Z]+")
-#Data$type_source <- rep(data_type, sapply(files, nrow))
+#data$type_source <- rep(data_type, sapply(files, nrow))
 d1$type_source <- 'TV_Ads'
 d2$type_source <- 'TV_Ads'
 
-Data <- plyr::rbind.fill(d1,d2)
-Data <- as.data.frame(Data)
+data <- plyr::rbind.fill(d1,d2)
+data <- as.data.frame(data)
 
 
 # Recode Party Codes
-Data[Data==62100] <- 'GPC'
-Data[Data==62300] <- 'NDP'
-Data[Data==62400] <- 'LPC'
-Data[Data==62700] <- 'BQ'
-Data[Data==62600] <- 'CPC'
+data[data==62100] <- 'GPC'
+data[data==62300] <- 'NDP'
+data[data==62400] <- 'LPC'
+data[data==62700] <- 'BQ'
+data[data==62600] <- 'CPC'
 
 # Dummy date
-# Data$post <- 0
-# Data$post[Data$day>=18 & Data$month>=9] <- 1
+# data$post <- 0
+# data$post[data$day>=18 & data$month>=9] <- 1
 
 # Recode Variables
-# Data$direction[Data$direction==1] <- 'positive'
-# Data$direction[Data$direction==0] <- 'negative'
+# data$direction[data$direction==1] <- 'positive'
+# data$direction[data$direction==0] <- 'negative'
 
-Data$direction[Data$direction==1] <- 1
-Data$direction[Data$direction==0] <- -1
+data$direction[data$direction==1] <- 1
+data$direction[data$direction==0] <- -1
 
-Data[Data==99] <- NA
-Data$language[Data$language==1] <- 'en'
-Data$language[Data$language==3] <- 'fr'
+data[data==99] <- NA
+data$language[data$language==1] <- 'en'
+data$language[data$language==3] <- 'fr'
 
 # Clean workspace
-rm(list=setdiff(ls(), "Data"))
+rm(list=setdiff(ls(), "data"))
 invisible(gc())
