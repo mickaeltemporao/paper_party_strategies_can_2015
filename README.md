@@ -1,6 +1,12 @@
 # Party Strategies of the 2015 Canadian Federal Campaign
 Topic and sentiment analysis of the 2015 Canadian Federal Campaign.
 
+## TOOO:
+- [ ] Add TOP 5 topics by party
+- [ ] Change TOP 5 plot label
+- [ ] Try sentiment for tweets
+
+
 ## Canadian Television Ads Analysis
 ![Average direction of TV Ads by Party by Language](/reports/figures/tvads/20161130_tvads_neg_avg_by_party_by_lang.png)
 
