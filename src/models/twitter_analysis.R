@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-12-10 11:22:02
-# Modified:     2016-12-20 08:06:01
+# Modified:     2016-12-20 09:25:30
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -19,6 +19,7 @@ source('src/dictionaries/removed_words.R')
 policy_agendas <- dictionary(file = "src/dictionaries/policy_agendas.lc3")
 sentiment      <- dictionary(file = "src/dictionaries/sentiment.lc3")
 civi_rights    <- dictionary(file = "src/dictionaries/civil_rights.lc3")
+span           <- 1
 
 
 #### Create Corpus --------------------------------
@@ -60,12 +61,14 @@ sentiment_dfm <- dfm(tw_corpus,
               stem = F)
 
 # Convert to data frame and recode to dummies
-tw_sentiment <- as.data.frame(sentiment_dfm)
+tw_sentiment        <- as.data.frame(sentiment_dfm)
 #TODO: Code sentiment
 #tw_sentiment <- as.data.frame(ifelse(tw_sentiment == 0, 0, 1))
 names(tw_sentiment) <- c("sent_negative", "sent_positive")
 # bind topics to original data
-data <- cbind(data, tw_sentiment)
+data                <- cbind(data, tw_sentiment)
+data$sent_negative  <- -data$sent_negative
+data$sent_dir        <- data$sent_positive + data$sent_negative
 
 #### Plot Topics over time --------------------------------
 library(ggplot2)
@@ -80,6 +83,7 @@ plot_data <- data %>%
   dplyr::filter(value == 1)
 plot_data$topic <- gsub("topic_", "", plot_data$topic)
 plot_data$topic <- gsub("_|-", "", plot_data$topic)
+plot_data$sent_negative <- -plot_data$sent_negative
 
 ## Bar Plots ----------------
 # Average topics
@@ -145,9 +149,93 @@ ggplot(dplyr::filter(plot_data, topic %in% top), aes(x=date, fill=topic)) +
     legend.background= element_rect(fill = "white"),
     panel.background = element_rect(fill = "white"),
     plot.background = element_rect(fill = "white"))
-ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_twitter_topics_all_ts_by_party_prop.png'))
+ggsave(
+  paste0('reports/figures/twitter/',
+         format(Sys.time(), "%Y%m%d"),
+         '_twitter_topics_all_ts_by_party_prop.png')
+  )
 
-# XXX
+# Top 5 Tweets by party per day
+for (i in unique(data$source)) {
+  temp_data <- dplyr::filter(plot_data, source==i)
+  temp <- sort(table(temp_data$topic), decreasing=T)[1:5]
+  top <- names(temp)
+  pl<-ggplot(dplyr::filter(temp_data, topic %in% top), aes(x=date, fill=topic)) +
+    geom_bar(width=1, col='black', size=0.15) +
+    theme_fivethirtyeight() +
+    ggtitle(paste0(i, ' Top 5 topics in tweets during campaign by party')) +
+    theme(
+      legend.background= element_rect(fill = "white"),
+      panel.background = element_rect(fill = "white"),
+      plot.background = element_rect(fill = "white"))
+    print(pl)
+ ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_', i, '_twitter_top5_ts.png'))
+}
+
+#### Sentiment --------------------------------
+plot_data <- data %>%
+  dplyr::select(id, source, date, sent_dir)
+
+# Negative Count per ad per day
+d <- data %>%
+  group_by(date, source) %>%
+  dplyr::filter(sent_dir<0) %>%
+  summarize(target = n())
+
+ggplot(d, aes(x=date, y=target, col=source)) +
+  geom_jitter(size = 2, alpha=0.4) +
+  geom_smooth(se=F, alpha=.5) +
+  theme_fivethirtyeight() +
+  ggtitle('Count of Negative Tweets by day per Party') +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_', 'tw_neg_counts_by_day.png'), width=7, height=7)
+
+#TODO: Negative proportion per ad per day
+temp <- data
+temp$simp_dir <- ifelse(d$sent_dir > 0, 1,
+                ifelse(d$sent_dir < 0, -1, 0)
+              )
+d <- temp %>%
+  group_by(date, source, simp_dir) %>%
+  summarize(n = n()) %>%
+  mutate(target = round(n / sum(n),2)) %>%
+  ungroup %>%
+  dplyr::filter(simp_dir <= -1) %>% print
+
+ggplot(d, aes(x=date, y=target)) +
+  geom_jitter(aes(color=source), alpha=0.4)+
+  geom_smooth(aes(color=source), se=F) +
+  theme_fivethirtyeight() +
+  ggtitle('Proportion of Negative tweets per party by day') +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_', 'tw_neg_prop_by_day.png'), width=7, height=7)
+
+
+# Avg Direction per day
+d <- data %>%
+  group_by(date, source) %>%
+  arrange(date) %>%
+  summarize(direction=mean(sent_dir)) %>%
+  print
+ggplot(d, aes(x=date, y=direction)) +
+  geom_jitter(aes(color=source), alpha=0.2) +
+  geom_smooth(aes(color=source), se=F) +
+  theme_fivethirtyeight() +
+  ggtitle('Average Direction per day by Party') +
+  theme(
+    legend.background= element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"))
+ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_', 'tw_avg_dir_by_party_by_day.png'), width=7, height=7)
+
+
+# XXX ------------------------------
 # Select number of topics for LDA model
 library(ldatuning)
 library(SnowballC)
