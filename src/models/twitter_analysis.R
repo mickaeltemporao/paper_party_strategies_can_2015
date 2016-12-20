@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-12-10 11:22:02
-# Modified:     2016-12-13 15:23:46
+# Modified:     2016-12-20 08:06:01
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -17,6 +17,8 @@ library(quanteda)
 source('src/features/build_twitter_features.R')
 source('src/dictionaries/removed_words.R')
 policy_agendas <- dictionary(file = "src/dictionaries/policy_agendas.lc3")
+sentiment      <- dictionary(file = "src/dictionaries/sentiment.lc3")
+civi_rights    <- dictionary(file = "src/dictionaries/civil_rights.lc3")
 
 
 #### Create Corpus --------------------------------
@@ -51,11 +53,25 @@ names(tw_topics) <- paste0("topic_",names(tw_topics))
 # bind topics to original data
 data <- cbind(data, tw_topics)
 
+#### Extracting Sentiments --------------------------------
+sentiment_dfm <- dfm(tw_corpus,
+              dictionary = sentiment,
+              remove = c(stopwords("english")),
+              stem = F)
+
+# Convert to data frame and recode to dummies
+tw_sentiment <- as.data.frame(sentiment_dfm)
+#TODO: Code sentiment
+#tw_sentiment <- as.data.frame(ifelse(tw_sentiment == 0, 0, 1))
+names(tw_sentiment) <- c("sent_negative", "sent_positive")
+# bind topics to original data
+data <- cbind(data, tw_sentiment)
 
 #### Plot Topics over time --------------------------------
 library(ggplot2)
 library(ggthemes)
 library(tidyr)
+library(dplyr)
 
 ## Prepare data to tidy format ----------------
 plot_data <- data %>%
