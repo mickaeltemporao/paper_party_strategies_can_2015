@@ -5,7 +5,7 @@
 # Description:  TODO: (write me)
 # Version:      0.0.0.000
 # Created:      2016-12-10 11:22:02
-# Modified:     2016-12-20 09:25:30
+# Modified:     2016-12-20 15:30:31
 # Author:       Mickael Temporão < mickael.temporao.1 at ulaval.ca >
 # ------------------------------------------------------------------------------
 # Copyright (C) 2016 Mickael Temporão
@@ -68,7 +68,7 @@ names(tw_sentiment) <- c("sent_negative", "sent_positive")
 # bind topics to original data
 data                <- cbind(data, tw_sentiment)
 data$sent_negative  <- -data$sent_negative
-data$sent_dir        <- data$sent_positive + data$sent_negative
+data$sent_dir       <- data$sent_positive + data$sent_negative
 
 #### Plot Topics over time --------------------------------
 library(ggplot2)
@@ -163,13 +163,13 @@ for (i in unique(data$source)) {
   pl<-ggplot(dplyr::filter(temp_data, topic %in% top), aes(x=date, fill=topic)) +
     geom_bar(width=1, col='black', size=0.15) +
     theme_fivethirtyeight() +
-    ggtitle(paste0(i, ' Top 5 topics in tweets during campaign by party')) +
+    ggtitle(paste0(i, ' Top 5 topics in tweets during campaign by party without macroeconomy')) +
     theme(
       legend.background= element_rect(fill = "white"),
       panel.background = element_rect(fill = "white"),
       plot.background = element_rect(fill = "white"))
     print(pl)
- ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_', i, '_twitter_top5_ts.png'))
+ ggsave(paste0('reports/figures/twitter/', format(Sys.time(), "%Y%m%d"), '_', i, '_twitter_top5_rm_macro.png'))
 }
 
 #### Sentiment --------------------------------
